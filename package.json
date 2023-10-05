@@ -1,0 +1,20 @@
+{
+  "name": "movie_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2"
+  },
+  "Patch releases": "1.0 or 1.0.x or ~1.0.4",
+  "Minor releases": "1 or 1.x or ^1.0.4",
+  "Major releases": "* or x"
+}
