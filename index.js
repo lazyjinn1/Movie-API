@@ -145,25 +145,25 @@ app.get('/movies', (request, response) => {
 });
 
 // Request: See specific movie details
-app.get('/movies/:title', (request, response) => {
+app.get('/movies/title/:title', (request, response) => {
     response.json(topTenMovies.find((movie) => {
         return movie.movieName === request.params.title
     }));
 });
 
 // Request: See movies by genre
-app.get('/:genre', (request, response) =>{
-    // response.json(topTenMovies.find((movie) => {
-    //     return movie.movieGenre === request.params.genre
-    // }));
+app.get('/movies/genre/:genre', (request, response) =>{
+    response.json(topTenMovies.filter((movie) => {
+        return movie.movieGenre === request.params.genre
+    }));
     response.status(200).send('Successfully filtered movies based on ' + request.params.genre + ".");
 });
 
 // Request: See movies by director
-app.get('/movies/:director', (request, response) => {
-    // response.json(topTenMovies.find((movie) => {
-    //     return movie.movieDirector === request.params.director
-    // }));
+app.get('/movies/director/:director', (request, response) => {
+    response.json(topTenMovies.filter((movie) => {
+        return movie.movieDirector === request.params.director
+    }));
     response.status(200).send('Successfully filtered movies based on ' + request.params.director + ".");
 });
 
