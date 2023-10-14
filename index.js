@@ -1,8 +1,20 @@
 // defining express to a variable. Express is used as a way to make writing node easier
 const { error } = require('console');
-const express = require('express'),
-bodyParser = require('body-parser'),
-uuid = require('uuid')
+const express = require('express');
+const mongoose = require('mongoose');
+const Models = require('./models.s');
+
+const Movies = Models.Movie;
+const Users = Models.User;
+
+mongoose.connect('mongodb://localhost:27017/test', { 
+    useNewURLParser: true, 
+    useUnifiedTopology:true
+});
+
+bodyParser = require('body-parser');
+uuid = require('uuid');
+
 
 // defining morgan. morgan allows you to have an easier time in handling logging
 morgan = require('morgan'),
@@ -168,37 +180,94 @@ app.get('/movies/director/:director', (request, response) => {
 });
 
 // Request: Registration
-app.post('/account/user-info/register', (request, response) => {
-    // let newUser = request.body;
-
-    // if (!newUser.userName || !newUser.passWord || !newUser.eMail){
-    //     let errorMessage = 'Error, invalid info';
-    //     response.status('400').send(errorMessage);
-    // } else{
-    //     let successMessage = 'Congratulations, your account is now registered! \n Please enjoy our selection.'
-    //     newUser.accountStatus === 'Active';
-    //     newUser.id = uuid.v5();
-    //     userList.push(newUser)
-    //     response.status(200).send(successMessage);
-    // }
-    response.status(200).send('Successfully registered!');
+app.post('/account/user-info/register', async (request, response) => {
+    await Users.findOne({Username: request.body.Username})
+        .then((user)=> {
+            if (user) {
+                return response.status(400).send(request.body.Username + ' already exists');
+            } else {
+                Users.create({
+                    Username: request.body.Username,
+                    Password: request.body.Password,
+                    Email: request.body.Email,
+                    Birthday: request.body.Birthday
+                })
+                    .then ((user) => {
+                        response.status(200).send(user + ' has been successfully registered!');
+                    })
+                .catch((error) => {
+                    console.error(error);
+                    response.status(500).send('Error: ' + error);
+                })
+            }     
+        })
+        .catch((error) => {
+            console.error(error);
+            response.status(500).send('Error: ' + error);
+        });
 });
 
-// Request: Change username
-app.put('/account/user-info/:user/:username', (request, response) => {
-    // let user = userList.find((user) =>{
-    //     return user.userName === request.params.user;
-    // });
-    
-    // if (user){
-    //     user.userName === request.params.username;
-    //     response.status(200).send('Your username is now ' + request.params.username)
-    // } else {
-    //     let errorMessage = 'Error, invalid info';
-    //     response.status('400').send(errorMessage);
-    // }
-    response.status(200).send('Successfully change username to: ' + request.params.user + '.');
-})
+app.get('/users',async (request, response) => {
+    await Users.find()
+        .then ((users)=>{
+            response.status(201).json(users);
+        })
+        .catch((error) => {
+            console.error(error);
+            response.status(500).send('Error: ' + error);
+        });
+});
+
+app.get('/users/:Username', async (request, response) => {
+    await Users.findOne({Username: request.params.Username})
+        .then ((user) => {
+            response.json(user);
+        })
+        .catch ((error)=>{
+            console.error(error);
+            response.status(500).send('Error: ' + error);
+        });
+}); 
+
+app.put('/users/:Username', async (request, response) => {
+    await UsersfindOneAndUpdate(
+        { 
+        Username: request.params.Username
+        }, 
+        {
+        $set:{
+            Username: request.body.Username,
+            Password: request.body.Password,
+            Email: request.body.Email,
+            Birthday: request.body.Birthday
+        }
+    },
+    { 
+        new: true 
+    })
+    .then((updatedUser) => {
+        response.json(updatedUser);
+    })
+    .catch((error) => {
+        console.error(error);
+        response.status(500).send('Error: ' + error);
+    });
+});
+
+app.delete('/users/:Username', async (request, response) => {
+    await Users.findOneAndRemove({ Username: request.params.Username })
+      .then((user) => {
+        if (!user) {
+            response.status(400).send(request.params.Username + ' was not found');
+        } else {
+            response.status(200).send(request.params.Username + ' was deleted.');
+        }
+      })
+      .catch((err) => {
+        console.error(error);
+        response.status(500).send('Error: ' + error);
+      });
+  });
 
 // Request: Add movie to favorites
 app.put('/movies/favorites/:addFav', (request, response) => {
@@ -208,11 +277,6 @@ app.put('/movies/favorites/:addFav', (request, response) => {
 // Request: Remove movie from favorites
 app.delete('/movies/favorites/:removeFav', (request, response) => {
     response.status(200).send('Successfully removed ' + request.params.removeFav + ' from favorites.');
-});
-
-// Request: Delete Account
-app.delete('/account/user-info/:user/deregister', (request, response) => {
-    response.status(200).send('Successfully deleted ' + request.params.user + "'s account from the server.");
 });
 
 // error logger just in case something wrong happens
