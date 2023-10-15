@@ -16,7 +16,7 @@ let movieSchema = mongoose.Schema({
     Featured: Boolean,
 });
 
-let userSchema = mongoose.Schem({
+let userSchema = mongoose.Schema({
     Username: {type: String, required: true},
     Password: {type: String, required:  true},
     Email: {type: String, required: true},
