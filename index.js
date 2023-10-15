@@ -58,7 +58,7 @@ app.get('/', (request, response) => {
     response.sendFile('public/documentation.html', {root: __dirname});
 });
 
-// if user loads into /movies, this returns the topTenMovies array in JSON
+// if user loads into /movies, this returns the movies in JSON
 // Request: See all movies
 app.get('/movies',async (request, response) => {
     await Movies.find()
