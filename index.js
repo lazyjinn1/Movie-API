@@ -4,24 +4,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Models = require('./models.js');
 const { Movie } = require('./models');
+const port = 8080;
 
 const Movies = Models.Movie;
 const Users = Models.User;
 
-mongoose.connect('mongodb://localhost:3000/test', { 
-    useNewURLParser: true, 
-    useUnifiedTopology:true
+mongoose.connect('mongodb://127.0.0.1:27017/test', { 
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
 });
 
 bodyParser = require('body-parser');
-//uuid = require('uuid');
-
-
-// defining morgan. morgan allows you to have an easier time in handling logging
-//morgan = require('morgan');
-
-// defining fs. fs is the file system and has access to your computer's files
-//fs = require('fs'),
 
 // defining path. path is the last part of the url
 path = require('path');
@@ -29,28 +22,8 @@ path = require('path');
 // defining a variable app as express's many functions
 const app = express();
 
-// creating an empty log stream  @ __dirname/txt.log
-//__dirname = directory name. In this case movie_api cus thats where index is //txt.log is a new file
-//flags: 'a' APPENDS/creates that txt log in that path (directory name);
-//const accessLogStream = fs.createWriteStream(path.join(__dirname, 'txt.log'), {flags: 'a'})
-
-// accessing morgan's 'combined' preset and logging what it finds directly into the previously created file
-//app.use(morgan('combined', {stream: accessLogStream}));
-
 app.use(bodyParser.json());
 
-//requests the time whenever it is called
-// let timeKeeper = (request,response,next) =>{
-//     request.timeKeeper = Date.now();
-//     //next() opens up the next middleware
-//     next();
-// };
-
-//activates timeKeeper
-// app.use(timeKeeper);
-//activates morgan's ('common') preset
-// app.use(morgan('common'));
-// opens up static files in the public folder 
 app.use(express.static('public'));
 
 // default page with no path brings you to documentation
@@ -85,7 +58,7 @@ app.get('/movies/title/:title', async (request, response) => {
 
 // Request: See movies by genre
 app.get('/movies/genre/:genre', async (request, response) =>{
-    await Movies.findOne({'Genre.Name': request.params.genre})
+    await Movies.find({'Genre.Name': request.params.genre})
         .then((movie) => {
             response.json(movie);
         })
@@ -97,7 +70,7 @@ app.get('/movies/genre/:genre', async (request, response) =>{
 
 // Request: See movies by director
 app.get('/movies/director/:director', async (request, response) =>{
-    await Movies.findOne({'Director.Name': request.params.director})
+    await Movies.find({'Director.Name': request.params.director})
         .then((movie) => {
             response.json(movie);
         })
@@ -121,7 +94,7 @@ app.post('/account/user-info/register', async (request, response) => {
                     Birthday: request.body.Birthday
                 })
                     .then ((user) => {
-                        response.status(200).send(user + ' has been successfully registered!');
+                        response.status(201).send(request.body.Username + ' has been successfully registered!');
                     })
                 .catch((error) => {
                     console.error(error);
@@ -135,6 +108,7 @@ app.post('/account/user-info/register', async (request, response) => {
         });
 });
 
+//Request: See all users
 app.get('/users',async (request, response) => {
     await Users.find()
         .then ((users)=>{
@@ -146,8 +120,9 @@ app.get('/users',async (request, response) => {
         });
 });
 
-app.get('/users/:Username', async (request, response) => {
-    await Users.findOne({Username: request.params.Username})
+// Request: See specific users
+app.get('/users/:username', async (request, response) => {
+    await Users.findOne({Username: request.params.username})
         .then ((user) => {
             response.json(user);
         })
@@ -157,10 +132,11 @@ app.get('/users/:Username', async (request, response) => {
         });
 }); 
 
-app.put('/users/:Username', async (request, response) => {
-    await UsersfindOneAndUpdate(
+// Request: See and Update specific users
+app.put('/users/user-info/:username', async (request, response) => {
+    await Users.findOneAndUpdate(
         { 
-        Username: request.params.Username
+        Username: request.params.username
         }, 
         {
         $set:{
@@ -182,39 +158,82 @@ app.put('/users/:Username', async (request, response) => {
     });
 });
 
-app.delete('/users/:Username', async (request, response) => {
-    await Users.findOneAndRemove({ Username: request.params.Username })
+// Request: Delete specific users
+app.delete('/users/user-info/:username/deregister', async (request, response) => {
+    await Users.findOneAndRemove({ Username: request.params.username })
       .then((user) => {
         if (!user) {
-            response.status(400).send(request.params.Username + ' was not found');
+            response.status(400).send(request.params.username + ' was not found');
         } else {
-            response.status(200).send(request.params.Username + ' was deleted.');
+            response.status(200).send(request.params.username + ' was deleted.');
         }
       })
-      .catch((err) => {
+      .catch((error) => {
         console.error(error);
         response.status(500).send('Error: ' + error);
       });
   });
 
 // Request: Add movie to favorites
-// app.put('/movies/favorites/:addFav', async (request, response) => {
+app.put('/users/:username/favorites/:movie', async (request, response) => {
+    try{
+        const user = await Users.findOne({Username: request.params.username})
+        if (!user) {
+            return response.status(404).send('User not found.');
+        }
 
-// })
+        const movie = await Movies.findOne({Title: request.params.movie})
+        if (!movie){
+            response.status(400).send(request.params.movie + ' was not found in the database.');
+        } else if (user.FavoriteMovies.includes(movie._id)){
+            response.status(400).send(request.params.movie + ' is already in your Favorites.');
+        } else {
+            user.FavoriteMovies.push(movie._id);
+            response.status(200).json(request.params.movie + ' has been added to Favorites.');
+            await user.save();
+        }
 
+    } catch(error) {
+        console.error(error);
+        response.status(500).send('Error: ' + error);
+    }
+    
+});
 
-// // Request: Remove movie from favorites
-// app.delete('/movies/favorites/:removeFav', async (request, response) => {
-// });
+// Request: Remove movie from favorites
+app.delete('/users/:username/favorites/:movie', async (request, response) => {
+    try{
+        const user = await Users.findOne({Username: request.params.username})
+        if (!user) {
+            return response.status(404).send('User not found.');
+        }
+
+        const movie = await Movies.findOne({Title: request.params.movie})
+        if (!movie){
+            response.status(400).send(request.params.movie + ' was not found in the database.');
+        } else if (!user.FavoriteMovies.includes(movie._id)){
+            response.status(400).send(request.params.movie + ' was not found in your Favorites.');
+        } else {
+            user.FavoriteMovies.pull(movie._id);
+            response.status(200).json(request.params.movie + ' has been removed to Favorites.');
+            await user.save();
+        }
+
+    } catch(error) {
+        console.error(error);
+        response.status(500).send('Error: ' + error);
+    }
+    
+});
 
 // error logger just in case something wrong happens
-app.use((error, request, response, next) => {
+app.use((error, request, response) => {
     console.error(error.stack);
     console.log('Whoops, something broke');
     response.status(500).send('Something Broke Oh no!');
 })
 
 //default port
-app.listen(3000, () => {
-    console.log('You are listening on port 3000');
+app.listen(port, () => {
+    console.log(`You are listening on port ${port}`);
 });
