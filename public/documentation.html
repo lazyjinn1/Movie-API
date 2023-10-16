@@ -19,6 +19,7 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- Request: See all movies -->
                 <tr>
                     <td>
                         See all movies <br><br>
@@ -33,50 +34,85 @@
                     <td>GET<br><br></td>
                 </tr>
 
+                <!-- Request: See specific movies by Title -->
                 <tr>
                     <td>
                         See specific movie details<br><br>
                     </td>
 
                     <td>
-                        Return data 
-                        <br>(description, genre, director, image URL, whether it`s featured or not) 
-                        <br>about a single movie by title to the user <br> <br>
+                        Return data about a single movie by title to the user <br> <br>
+                        <br>(description, genre, director, image URL, whether it`s featured or not)  <br> <br>
                     </td>
 
-                    <td>"/movies/:title"<br><br></td>    
+                    <td>"/movies/title/:title"<br><br></td>    
                     
                     <td>GET<br><br></td> 
                 </tr>
                 
+                <!-- Request: See specific movies by Genre -->
                 <tr>
                     <td>
                         See movies by genre<br><br>
                     </td>
 
                     <td>
-                        Return data about a genre (description) by name/title (e.g., “Thriller”)<br><br>
+                        Return data 
+                        <br>about all movies by genre to the user <br><br>
                     </td>
 
-                    <td>"/movies/:genre"<br><br></td>
+                    <td>"/movies/genre/:genre"<br><br></td>
 
                     <td>GET<br><br></td> 
                 </tr>
 
+                <!-- Request: See specific movies by Director -->
                 <tr>
                     <td>
                         See movies by director<br><br>
                     </td>
 
                     <td>
-                        Return data about a director (bio, birth year, death year) by name<br><br>
+                        Return data 
+                        <br>about all movies by director to the user <br><br>
                     </td>
 
-                    <td>"/movies/:director"<br><br></td>   
+                    <td>"/movies/director/:director"<br><br></td>   
                     
                     <td>GET<br><br></td> 
                 </tr>
 
+                <!-- Request: See all users -->
+                <tr>
+                    <td>
+                        See all users <br><br>
+                    </td>
+
+                    <td>
+                        Return a list of ALL users to the user<br><br>
+                    </td>
+
+                    <td>"/users"<br><br></td>
+
+                    <td>GET<br><br></td>
+                </tr>
+
+                <!-- Request: See specific user by username -->
+                <tr>
+                    <td>
+                        See a specific user <br><br>
+                    </td>
+
+                    <td>
+                        Return information about a specific user by username<br><br>
+                    </td>
+
+                    <td>"/users/:username"<br><br></td>
+
+                    <td>GET<br><br></td>
+                </tr>
+
+                <!-- Request: New Account Registration -->
                 <tr>
                     <td>
                         Registration<br><br>
@@ -91,20 +127,22 @@
                     <td>POST<br><br></td> 
                 </tr>
 
+                <!-- Request: Change Account Information -->
                 <tr>
                     <td>
-                        Change username<br><br>
+                        Change Account Information<br><br>
                     </td>
 
                     <td>
-                        Allow users to update their user info (username)<br><br>
+                        Allow users to update their user info<br><br>
                     </td>
 
-                    <td>"/account/user-info/:user/:username"<br><br></td>
+                    <td>"/users/user-info/:username"<br><br></td>
                     
                     <td>PUT<br><br></td> 
                 </tr>
 
+                <!-- Request: Add a movie to favorites -->
                 <tr>
                     <td>
                         Add movie to favorites<br><br>
@@ -112,14 +150,14 @@
 
                     <td>
                         Allow users to add a movie to their list of favorites 
-                        <br>(showing only a text that a movie has been added—more on this later);<br><br>
                     </td>
 
-                    <td>"/movies/favorites/:addFav"<br><br></td>     
+                    <td>"/users/:username/favorites/:movie"<br><br></td>     
                     
                     <td>PUT<br><br></td> 
                 </tr>
 
+                <!-- Request: Remove a movie from favorites -->
                 <tr>
                     <td>
                         Remove movie from favorites<br><br>
@@ -127,14 +165,14 @@
 
                     <td>
                         Allow users to remove a movie from their list of favorites 
-                        <br>(showing only a text that a movie has been removed—more on this later);<br><br>
                     </td>
 
-                    <td>"/movies/favorites/:removeFav"<br><br></td>  
+                    <td>"/users/:username/favorites/:movie"<br><br></td>  
                     
                     <td>DELETE<br><br></td> 
                 </tr>
 
+                <!-- Request: Delete Account -->
                 <tr>
                     <td>
                         Delete Account<br><br>
@@ -142,10 +180,9 @@
 
                     <td>
                         Allow existing users to deregister 
-                        <br>(showing only a text that a user email has been removed—more on this later).<br><br>
                     </td>
 
-                    <td>"/account/user-info/:user/deregister"<br><br></td>   
+                    <td>"/users/user-info/:username/deregister"<br><br></td>   
 
                     <td>DELETE<br><br></td>                  
                 </tr>

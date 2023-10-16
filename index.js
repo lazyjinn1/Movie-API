@@ -132,7 +132,7 @@ app.get('/users/:username', async (request, response) => {
         });
 }); 
 
-// Request: See and Update specific users
+// Request: Change Account Information
 app.put('/users/user-info/:username', async (request, response) => {
     await Users.findOneAndUpdate(
         { 
