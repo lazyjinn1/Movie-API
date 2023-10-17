@@ -81,7 +81,7 @@ app.get('/movies/director/:director', async (request, response) =>{
 })
 
 // Request: Registration
-app.post('/account/user-info/register', async (request, response) => {
+app.post('/user/user-info/register', async (request, response) => {
     await Users.findOne({Username: request.body.Username})
         .then((user)=> {
             if (user) {
