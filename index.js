@@ -1,7 +1,9 @@
 // defining express to a variable. Express is used as a way to make writing node easier
+const { error } = require('console');
 const express = require('express');
 const mongoose = require('mongoose');
 const Models = require('./models.js');
+const { Movie } = require('./models');
 const port = 8080;
 
 const Movies = Models.Movie;
