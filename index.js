@@ -24,6 +24,9 @@ const {check, validationResult} = require('express-validator');
 // number in the environment variable.
 const port = process.env.PORT;
 
+// If you want to connect locally:
+// const port = 8080;
+
 // defines a Movies variable that relates to each movie in the Models' Movie Schema.
 const Movies = Models.Movie;
 
@@ -41,7 +44,7 @@ const app = express();
 // });
 
 // connects our server to the MongoDB Database ON ATLAS
-mongoose.connect('process.env.CONNECTION_URI', { 
+mongoose.connect(process.env.CONNECTION_URI, { 
     useNewUrlParser: true, 
     useUnifiedTopology: true
 });
@@ -358,5 +361,5 @@ app.use((error, request, response, next) => {
 
 //default port
 app.listen(port, '0.0.0.0', () => {
-    console.log(`You are listening on port ` + port)
+    console.log(`You are listening on port ` + `${port}`)
 });
