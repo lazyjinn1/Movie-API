@@ -8,14 +8,21 @@ const express = require('express');
 // utilize and work with the data stored in MongoDB (our database)
 const mongoose = require('mongoose');
 
+// defines cors. CORS = Cross Origin Resource Sharing. Allows you to extend HTTP requests.
+const cors = require('cors');
+
 // connects us to our models.js file which is where our different Schemas for our Movies and Users are
 const Models = require('./models.js');
 
 // imports our models.js file where our different Schemas for our Movies and Users are
 const { Movie } = require('./models');
 
-// defines the port that we are going to listen to for the server
-const port = 8080;
+// defines express-validator and what we're using from it.
+const {check, validationResult} = require('express-validator');
+
+// defines the port that we are going to listen to for the server. Currently defining a pre-configured port
+// number in the environment variable.
+const port = process.env.PORT;
 
 // defines a Movies variable that relates to each movie in the Models' Movie Schema.
 const Movies = Models.Movie;
@@ -26,11 +33,31 @@ const Users = Models.User;
 // defining a variable app as express's many functions
 const app = express();
 
+
 // connects our server to the MongoDB Database
 mongoose.connect('mongodb://127.0.0.1:27017/test', { 
     useNewUrlParser: true, 
     useUnifiedTopology: true
 });
+
+// list of origins that are allowed by CORS
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
+
+// launches CORS
+app.use(cors({
+    // this looks for what the origin is and the appropriate response
+    origin: (origin, callback) => {
+        // if there is NO origin, then it goes through
+        if (!origin) return callback (null, true);
+        // if the origin exists but does NOT match an origin in the allowedOrigins array, then this error happens
+        if (allowedOrigins.indexOf(origin) === -1) {
+            let message = 'The CORS policy for this application doesn\'t allow access from origin ' + origin;
+            return callback (new Error(message), false);
+        }
+        // if it does match an origin in the allowedOrigins array, then it goes through.
+        return callback(null, true);
+    }
+}));
 
 // parses data in the body of the document
 bodyParser = require('body-parser');
@@ -118,7 +145,29 @@ app.get('/movies/director/:director', passport.authenticate('jwt', { session: fa
 })
 
 // Request: Registration
-app.post('/user/user-info/register', async (request, response) => {
+app.post('/user/user-info/register', 
+[
+    // checks if Username is at least 5 characters long
+    check('Username', 'Username is too short').isLength({min: 5}),
+    // checks if Username is alphanumeric
+    check('Username', 'Non alphanumeric Usernames are not allowed').isAlphanumeric,
+    // checks if Password exists
+    check('Password', 'Password cannnot be empty').not().isEmpty(),
+    // checks if Email is valid
+    check('Email', 'Email is invalid').isEmail()
+
+], async (request, response) => {
+
+    // defines errors from the checks
+    let errors = validationResult(request);
+
+    // if any errors DO show up, then a json with all the error messages are sent as a response.
+    if (!errors.isEmpty()) {
+        return response.status(422).json({errors: errors.array()});
+    }
+
+    // hashes the password placed as the 'Password' under User.create and gives it the variable hashedPassword
+    let hashedPassword = Users.hashPassword(request.body.Password);
     await Users.findOne({Username: request.body.Username})
         // if username already exists on the database then an error is sent.
         .then((user)=> {
@@ -129,13 +178,12 @@ app.post('/user/user-info/register', async (request, response) => {
                 // email and birthday are taken to create a new user.
                 Users.create({
                     Username: request.body.Username,
-                    Password: request.body.Password,
+                    Password: hashedPassword,
                     Email: request.body.Email,
                     Birthday: request.body.Birthday
-                })
-                // after the new user is created, a code is sent out and 
-                // a message that tells the user of their successful registration
-                    .then ((user) => {
+                }).then (() => {
+                        // after the new user is created, a code is sent out and 
+                        // a message that tells the user of their successful registration
                         response.status(201).send(request.body.Username + ' has been successfully registered!');
                     })
                 // otherwise, an error occurs
@@ -303,6 +351,6 @@ app.use((error, request, response, next) => {
 });
 
 //default port
-app.listen(port, () => {
-    console.log(`You are listening on port ${port}`)
+app.listen(port, '0.0.0.0', () => {
+    console.log(`You are listening on port ` + port)
 });
