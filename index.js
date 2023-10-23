@@ -154,60 +154,40 @@ app.get('/movies/director/:director', passport.authenticate('jwt', { session: fa
 })
 
 // Request: Registration
-app.post('/user/user-info/register', 
-[
-    // checks if Username is at least 5 characters long
-    check('Username', 'Username is too short').isLength({min: 5}),
-    // checks if Username is alphanumeric
-    check('Username', 'Non alphanumeric Usernames are not allowed').isAlphanumeric,
-    // checks if Password exists
-    check('Password', 'Password cannnot be empty').not().isEmpty(),
-    // checks if Email is valid
-    check('Email', 'Email is invalid').isEmail()
+app.post('/user/user-info/register',
+    [
+        check('Username', 'Username is too short').isLength({ min: 5 }),
+        check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
+        check('Password', 'Password cannot be empty').not().isEmpty(),
+        check('Email', 'Email is invalid').isEmail()
+    ], async (request, response) => {
+        try {
+            const errors = validationResult(request);
+            if (!errors.isEmpty()) {
+                return response.status(422).json({ errors: errors.array() });
+            }
 
-], async (request, response) => {
-
-    // defines errors from the checks
-    let errors = validationResult(request);
-
-    // if any errors DO show up, then a json with all the error messages are sent as a response.
-    if (!errors.isEmpty()) {
-        return response.status(422).json({errors: errors.array()});
-    }
-
-    // hashes the password placed as the 'Password' under User.create and gives it the variable hashedPassword
-    let hashedPassword = Users.hashPassword(request.body.Password);
-    await Users.findOne({Username: request.body.Username})
-        // if username already exists on the database then an error is sent.
-        .then((user)=> {
-            if (user) {
+            const existingUser = await Users.findOne({ Username: request.body.Username });
+            if (existingUser) {
                 return response.status(400).send(request.body.Username + ' already exists');
-            } else {
-                // if the username DOESN'T exist, then a username, password,
-                // email and birthday are taken to create a new user.
-                Users.create({
-                    Username: request.body.Username,
-                    Password: hashedPassword,
-                    Email: request.body.Email,
-                    Birthday: request.body.Birthday
-                }).then (() => {
-                        // after the new user is created, a code is sent out and 
-                        // a message that tells the user of their successful registration
-                        response.status(201).send(request.body.Username + ' has been successfully registered!');
-                    })
-                // otherwise, an error occurs
-                .catch((error) => {
-                    console.error(error);
-                    response.status(500).send('Error: ' + error);
-                })
-            }     
-        })
-        // if any unforeseen errors occur, this is here to adress them.
-        .catch((error) => {
+            }
+
+            const hashedPassword = await Users.hashPassword(request.body.Password);
+            await Users.create({
+                Username: request.body.Username,
+                Password: hashedPassword,
+                Email: request.body.Email,
+                Birthday: request.body.Birthday
+            });
+
+            response.status(201).send(request.body.Username + ' has been successfully registered!');
+        } catch (error) {
             console.error(error);
             response.status(500).send('Error: ' + error);
-        });
-});
+        }
+    }
+);
+
 
 //Request: See all users
 app.get('/users', passport.authenticate('jwt', {session: false}), async (request, response) => {
