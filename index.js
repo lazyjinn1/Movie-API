@@ -219,6 +219,7 @@ app.get('/users/:username', passport.authenticate('jwt', {session: false}), asyn
 
 // Request: Change Account Information
 app.put('/users/user-info/:username', passport.authenticate('jwt',{session: false}), async (request, response) => {
+    let hashedPassword = Users.hashPassword(request.body.Password);
     if (request.user.Username !== request.params.username){
         return response.status(400).send('Permission denied');
     }
@@ -228,7 +229,7 @@ app.put('/users/user-info/:username', passport.authenticate('jwt',{session: fals
             // Using the above username, we are now going to update ('$ set) new information.
             $set:{
                 Username: request.body.Username,
-                Password: request.body.Password,
+                Password: hashedPassword,
                 Email: request.body.Email,
                 Birthday: request.body.Birthday
             }
