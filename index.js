@@ -220,6 +220,7 @@ app.get('/users/:username', passport.authenticate('jwt', {session: false}), asyn
 // Request: Change Account Information
 app.put('/users/user-info/:username', passport.authenticate('jwt',{session: false}), async (request, response) => {
     let hashedPassword = Users.hashPassword(request.body.Password);
+
     if (request.user.Username !== request.params.username){
         return response.status(400).send('Permission denied');
     }
@@ -321,7 +322,7 @@ app.delete('/users/:username/favorites/:movie', passport.authenticate('jwt', {se
         } else {
             // otherwise, this pulls the old movie id away and removes it from your Favorites List.
             user.FavoriteMovies.pull(movie._id);
-            response.status(200).json(request.params.movie + ' has been removed to Favorites.');
+            response.status(200).json(request.params.movie + ' has been removed from Favorites.');
             // saves the data.
             await user.save();
         }
@@ -337,7 +338,7 @@ app.delete('/users/:username/favorites/:movie', passport.authenticate('jwt', {se
 app.use((error, request, response, next) => {
     console.error(error.stack);
     console.log('Whoops, something broke');
-    response.status(500).send('Something Broke Oh no!');
+    response.status(500).json({error: 'Something Broke Oh no!', message: error.message});
 });
 
 //default port
