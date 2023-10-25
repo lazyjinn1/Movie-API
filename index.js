@@ -285,14 +285,14 @@ async (request, response) => {
         if (!user) {
             return response.status(404).send('User not found.');
         }
-        //defines movie as a movie with the title in :movie
+        //defines movie as a movie with the movieID in :movieID
         const movie = await Movies.findOne({ _id: request.params.movieID })
 
-        // if movies does not exist, then an error is sent.
+
         if (!movie) {
             response.status(404).send(movie.Title + ' was not found in the database.');
-            // if movie dodes exist but is already in the user's Favorites list, then this error is sent.
-        } else if (user.FavoriteMovies.includes(movie)) {
+            // if movie does exist but is already in the user's Favorites list, then this error is sent.
+        } else if (user.FavoriteMovies.includes(movie._id)) {
             response.status(404).send(movie.Title + ' is already in your Favorites.');
         } else {
             // otherwise, it all goes through and a new movie is added to Favorites.
@@ -324,13 +324,13 @@ async (request, response) => {
             return response.status(404).send('User not found.');
         }
 
-        //defines movie as a movie with the title in :movie
+        //defines movie as a movie with the movieID in :movieID
         const movie = await Movies.findOne({ _id: request.params.movieID })
-        // if movie does not exist, then this error will occur.
+
         if (!movie) {
             response.status(404).send(movie.Title + ' was not found in the database.');
             // if this movie was not in your favorites, then this error occurs.
-        } else if (!user.FavoriteMovies.includes(movie)) {
+        } else if (!user.FavoriteMovies.includes(movie._id)) {
             response.status(404).send(movie.Title + ' was not found in your Favorites.');
         } else {
             // otherwise, this pulls the old movie id away and removes it from your Favorites List.
