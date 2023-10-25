@@ -292,7 +292,7 @@ async (request, response) => {
         if (!movie) {
             response.status(404).send(request.params.movieID + ' was not found in the database.');
             // if movie dodes exist but is already in the user's Favorites list, then this error is sent.
-        } else if (user.FavoriteMovies.includes(movie._id)) {
+        } else if (user.FavoriteMovies.includes(_id)) {
             response.status(404).send(request.params.movieID + ' is already in your Favorites.');
         } else {
             // otherwise, it all goes through and a new movie is added to Favorites.
@@ -330,11 +330,11 @@ async (request, response) => {
         if (!movie) {
             response.status(400).send(request.params.movieID + ' was not found in the database.');
             // if this movie was not in your favorites, then this error occurs.
-        } else if (!user.FavoriteMovies.includes(movie._id)) {
+        } else if (!user.FavoriteMovies.includes(_id)) {
             response.status(400).send(request.params.movieID + ' was not found in your Favorites.');
         } else {
             // otherwise, this pulls the old movie id away and removes it from your Favorites List.
-            user.FavoriteMovies.pull(movie._id);
+            user.FavoriteMovies.pull(_id);
             // saves the data.
             await user.save();
             response.status(200).json(request.params.movieID + ' has been removed from Favorites.');
