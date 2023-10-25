@@ -138,7 +138,7 @@
                         Allow new users to register<br><br>
                     </td>
 
-                    <td>"/account/user-info/register"<br><br></td>   
+                    <td>"/users/register"<br><br></td>   
                     
                     <td>POST<br><br></td> 
                 </tr>
@@ -153,7 +153,7 @@
                         Allow users to update their user info<br><br>
                     </td>
 
-                    <td>"/users/user-info/:username"<br><br></td>
+                    <td>"/users/:username"<br><br></td>
                     
                     <td>PUT<br><br></td> 
                 </tr>
@@ -168,7 +168,7 @@
                         Allow users to add a movie to their list of favorites <br><br>
                     </td>
 
-                    <td>"/users/:username/favorites/:movie"<br><br></td>     
+                    <td>"/users/:username/favorites/:movieID"<br><br></td>     
                     
                     <td>PUT<br><br></td> 
                 </tr>
@@ -183,22 +183,22 @@
                         Allow users to remove a movie from their list of favorites <br><br>
                     </td>
 
-                    <td>"/users/:username/favorites/:movie"<br><br></td>  
+                    <td>"/users/:username/favorites/:movieID"<br><br></td>  
                     
                     <td>DELETE<br><br></td> 
                 </tr>
 
-                <!-- Request: Delete Account -->
+                <!-- Request: Delete Specific Users -->
                 <tr>
                     <td>
-                        Delete Account<br><br>
+                        Delete Specific Users<br><br>
                     </td>
 
                     <td>
                         Allow existing users to deregister <br><br>
                     </td>
 
-                    <td>"/users/user-info/:username/deregister"<br><br></td>   
+                    <td>"/users/:username/deregister"<br><br></td>   
 
                     <td>DELETE<br><br></td>                  
                 </tr>
