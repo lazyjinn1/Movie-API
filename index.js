@@ -94,7 +94,8 @@ app.get('/', (request, response) => {
 
 // if user loads into /movies, this returns the movies in JSON
 // Request: See all movies
-app.get('/movies', passport.authenticate('jwt', { session: false }),
+app.get('/movies', 
+    passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find()
             // if movies are found, it responds with a positive status code and a list of the 
@@ -110,7 +111,8 @@ app.get('/movies', passport.authenticate('jwt', { session: false }),
     });
 
 // Request: See specific movie details
-app.get('/movies/title/:title', passport.authenticate('jwt', { session: false }),
+app.get('/movies/title/:title', 
+passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.findOne({ Title: request.params.title })
             // if a movie is found with the given title, said movie is returned.
@@ -125,7 +127,8 @@ app.get('/movies/title/:title', passport.authenticate('jwt', { session: false })
     })
 
 // Request: See movies by genre
-app.get('/movies/genre/:genre', passport.authenticate('jwt', { session: false }),
+app.get('/movies/genre/:genre', 
+    passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find({ 'Genre.Name': request.params.genre })
             // if movies are found with the given genre, said movies is returned.
@@ -140,7 +143,8 @@ app.get('/movies/genre/:genre', passport.authenticate('jwt', { session: false })
     })
 
 // Request: See movies by director
-app.get('/movies/director/:director', passport.authenticate('jwt', { session: false }),
+app.get('/movies/director/:director', 
+        passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find({ 'Director.Name': request.params.director })
             // if movies are found with the given director, said movies is returned.
@@ -229,11 +233,16 @@ check('Email', 'Email is invalid').isEmail()
 ], passport.authenticate('jwt', { session: false }), 
 async (request, response) => {
     try {
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            return response.status(422).json({ errors: errors.array() });
+        }
+
         if (request.user.Username !== request.params.username) {
             return response.status(400).send('Permission denied');
         }
 
-        const hashedPassword = await Users.hashPassword(request.body.Password);
+        const hashedPassword = Users.hashPassword(request.body.Password);
 
         const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
             $set: {
