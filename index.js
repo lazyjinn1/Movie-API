@@ -221,7 +221,13 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }),
     });
 
 // Request: Change Account Information
-app.put('/users/:username', passport.authenticate('jwt', { session: false }), async (request, response) => {
+app.put('/users/:username', 
+[check('Username', 'Username is too short').isLength({ min: 5 }),
+check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
+check('Password', 'Password cannot be empty').not().isEmpty(),
+check('Email', 'Email is invalid').isEmail()
+], passport.authenticate('jwt', { session: false }), 
+async (request, response) => {
     try {
         if (request.user.Username !== request.params.username) {
             return response.status(400).send('Permission denied');
