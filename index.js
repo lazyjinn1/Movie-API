@@ -177,7 +177,7 @@ app.post('/users/register',
                 return response.status(400).send(request.body.Username + ' already exists');
             }
 
-            const hashedPassword = await Users.hashPassword(request.body.Password);
+            const hashedPassword = await Users.hashPassword(request.body.Password,10);
             await Users.create({
                 Username: request.body.Username,
                 Password: hashedPassword,
@@ -230,6 +230,7 @@ app.put('/users/:username',
 check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric().optional({ checkFalsy: true }),
 check('Password', 'Password cannot be empty').optional({ checkFalsy: true }),
 check('Email', 'Email is invalid').isEmail().optional({ checkFalsy: true }),
+check('BIrthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
 ], 
 passport.authenticate('jwt', { session: false }), 
 async (request, response) => {
@@ -243,7 +244,7 @@ async (request, response) => {
             return response.status(400).send('Permission denied');
         }
 
-        const hashedPassword = await Users.hashPassword(request.body.Password);
+        const hashedPassword = await Users.hashPassword(request.body.Password,10);
 
         const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
             $set: {
