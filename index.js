@@ -226,8 +226,8 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }),
 
 // Request: Change Account Information
 app.put('/users/:username', 
-[check('Username', 'Username is too short').isLength({ min: 5 }),
-check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
+[check('Username', 'Username is too short').isLength({ min: 5 }).optional({ checkFalsy: true }),
+check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric().optional({ checkFalsy: true }),
 check('Password', 'Password cannot be empty').optional({ checkFalsy: true }),
 check('Email', 'Email is invalid').isEmail().optional({ checkFalsy: true }),
 ], 
