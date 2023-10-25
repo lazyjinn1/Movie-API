@@ -334,7 +334,10 @@ async (request, response) => {
             response.status(400).send(movie.Title + ' was not found in your Favorites.');
         } else {
             // otherwise, this pulls the old movie id away and removes it from your Favorites List.
-            user.FavoriteMovies.pull(movie._id);
+            await Users.findOneAndUpdate({ Username: request.params.username }, {
+                $pull: { FavoriteMovies: request.params.movieID }
+            },
+                { new: true })
             // saves the data.
             await user.save();
             response.status(200).json(movie.Title + ' has been removed from Favorites.');
