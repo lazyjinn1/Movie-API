@@ -228,8 +228,8 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }),
 app.put('/users/:username', 
 [check('Username', 'Username is too short').isLength({ min: 5 }),
 check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
-check('Password', 'Password cannot be empty').not().isEmpty(),
-check('Email', 'Email is invalid').isEmail()
+check('Password', 'Password cannot be empty').optional,
+check('Email', 'Email is invalid').isEmail().optional
 ], 
 passport.authenticate('jwt', { session: false }), 
 async (request, response) => {
