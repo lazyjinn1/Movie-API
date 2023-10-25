@@ -290,19 +290,19 @@ async (request, response) => {
 
         // if movies does not exist, then an error is sent.
         if (!movie) {
-            response.status(404).send(request.params.movieID + ' was not found in the database.');
+            response.status(404).send(request.movie.Title + ' was not found in the database.');
             // if movie dodes exist but is already in the user's Favorites list, then this error is sent.
         } else if (user.FavoriteMovies.includes(movie._id)) {
-            response.status(404).send(request.params.movieID + ' is already in your Favorites.');
+            response.status(404).send(request.movie.Title + ' is already in your Favorites.');
         } else {
             // otherwise, it all goes through and a new movie is added to Favorites.
             await Users.findOneAndUpdate({ Username: req.params.Username }, {
-                $push: { FavoriteMovies: req.params.MovieID }
+                $push: { FavoriteMovies: request.params.movieID }
             },
                 { new: true })
             // this saves the data.
             await user.save();
-            response.status(200).json(request.params.movie + ' has been added to Favorites.');
+            response.status(200).json(request.movie.Title + ' has been added to Favorites.');
 
         }
 
@@ -314,7 +314,7 @@ async (request, response) => {
 });
 
 // Request: Remove movie from favorites
-app.delete('/users/:username/favorites/:movie', passport.authenticate('jwt', { session: false }), 
+app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', { session: false }), 
 async (request, response) => {
     try {
         // defines user as someone in the Users database with the username stated in :username
@@ -325,19 +325,19 @@ async (request, response) => {
         }
 
         //defines movie as a movie with the title in :movie
-        const movie = await Movies.findOne({ Title: request.params.movie })
+        const movie = await Movies.findOne({ Title: request.params.movieID })
         // if movie does not exist, then this error will occur.
         if (!movie) {
-            response.status(400).send(request.params.movie + ' was not found in the database.');
+            response.status(400).send(request.movie.Title + ' was not found in the database.');
             // if this movie was not in your favorites, then this error occurs.
         } else if (!user.FavoriteMovies.includes(movie._id)) {
-            response.status(400).send(request.params.movie + ' was not found in your Favorites.');
+            response.status(400).send(request.movie.Title + ' was not found in your Favorites.');
         } else {
             // otherwise, this pulls the old movie id away and removes it from your Favorites List.
             user.FavoriteMovies.pull(movie._id);
             // saves the data.
             await user.save();
-            response.status(200).json(request.params.movie + ' has been removed from Favorites.');
+            response.status(200).json(request.movie.Title + ' has been removed from Favorites.');
 
         }
 
