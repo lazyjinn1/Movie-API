@@ -296,7 +296,7 @@ async (request, response) => {
             response.status(404).send(request.params.movieID + ' is already in your Favorites.');
         } else {
             // otherwise, it all goes through and a new movie is added to Favorites.
-            await Users.findOneAndUpdate({ Username: req.params.Username }, {
+            await Users.findOneAndUpdate({ Username: request.params.Username }, {
                 $push: { FavoriteMovies: request.params.movieID }
             },
                 { new: true })
