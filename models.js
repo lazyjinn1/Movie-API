@@ -32,13 +32,13 @@ let userSchema = mongoose.Schema({
 
 // this hashes the password that is inputted for the userSchema. Hashing means that it gets 
 // essentially codified and impossible to revert back to normal
-userSchema.statics.hashPassword = (password) => {
-    return bcrypt.hashSync(password,10);
+userSchema.statics.hashPassword = (Password) => {
+    return bcrypt.hashSync(Password,10);
 };
 
 // However, the hashed password can be compared to the hashed password that is in the database to allow login.
-userSchema.methods.validatePassword = function(password) {
-    return bcrypt.compareSync(password, this.Password);
+userSchema.methods.validatePassword = function(Password) {
+    return bcrypt.compareSync(Password, this.Password);
 };
 
 // gives variables for the finalized model (movie and user)

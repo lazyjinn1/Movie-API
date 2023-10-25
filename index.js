@@ -177,7 +177,7 @@ app.post('/users/register',
                 return response.status(400).send(request.body.Username + ' already exists');
             }
 
-            const hashedPassword = await Users.hashPassword(request.body.Password,10);
+            const hashedPassword = await Users.hashPassword(request.body.Password);
             await Users.create({
                 Username: request.body.Username,
                 Password: hashedPassword,
@@ -244,7 +244,7 @@ async (request, response) => {
             return response.status(400).send('Permission denied');
         }
 
-        const hashedPassword = await Users.hashPassword(request.body.Password,10);
+        const hashedPassword = await Users.hashPassword(request.body.Password);
 
         const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
             $set: {
