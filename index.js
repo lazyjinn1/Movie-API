@@ -230,7 +230,8 @@ app.put('/users/:username',
 check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
 check('Password', 'Password cannot be empty').not().isEmpty(),
 check('Email', 'Email is invalid').isEmail()
-], passport.authenticate('jwt', { session: false }), 
+], 
+passport.authenticate('jwt', { session: false }), 
 async (request, response) => {
     try {
         const errors = validationResult(request);
@@ -242,7 +243,7 @@ async (request, response) => {
             return response.status(400).send('Permission denied');
         }
 
-        const hashedPassword = Users.hashPassword(request.body.Password);
+        const hashedPassword = await Users.hashPassword(request.body.Password);
 
         const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
             $set: {
