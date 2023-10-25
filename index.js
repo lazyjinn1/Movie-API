@@ -328,10 +328,10 @@ async (request, response) => {
         const movie = await Movies.findOne({ _id: request.params.movieID })
         // if movie does not exist, then this error will occur.
         if (!movie) {
-            response.status(400).send(movie.Title + ' was not found in the database.');
+            response.status(404).send(movie.Title + ' was not found in the database.');
             // if this movie was not in your favorites, then this error occurs.
         } else if (!user.FavoriteMovies.includes(movie)) {
-            response.status(400).send(movie.Title + ' was not found in your Favorites.');
+            response.status(404).send(movie.Title + ' was not found in your Favorites.');
         } else {
             // otherwise, this pulls the old movie id away and removes it from your Favorites List.
             await Users.findOneAndUpdate({ Username: request.params.username }, {
