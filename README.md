@@ -1,4 +1,4 @@
-# Pokedex App
+# Movie Database App
 
 This is the API for my Jeriflix Client. It uses MongoDB in combination with Node and Express in order to create different endpoints to deliver the user to their desired outcomes.
 
