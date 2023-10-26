@@ -243,12 +243,23 @@ async (request, response) => {
             return response.status(400).send('Permission denied');
         }
 
-        const hashedPassword = await Users.hashPassword(request.body.Password);
+        // Check if the request body includes a new password.
+        if (request.body.Password) {
+            // If a new password is provided, hash it.
+            const hashedPassword = await Users.hashPassword(request.body.Password);
 
+            // Update the user's password with the new hashed password.
+            await Users.findOneAndUpdate({ Username: request.params.username }, {
+                $set: {
+                    Password: hashedPassword,
+                }
+            });
+        }
+
+        // Check if the request body has something else.
         const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
             $set: {
                 Username: request.body.Username,
-                Password: hashedPassword,
                 Email: request.body.Email,
                 Birthday: request.body.Birthday
             }
