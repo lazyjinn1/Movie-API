@@ -111,7 +111,7 @@ app.get('/movies',
     });
 
 // Request: See specific movie details
-app.get('/movies/title/:title', 
+app.get('/movies/:title', 
 passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.findOne({ Title: request.params.title })
@@ -127,7 +127,7 @@ passport.authenticate('jwt', { session: false }),
     })
 
 // Request: See movies by genre
-app.get('/movies/genre/:genre', 
+app.get('/movies/genres/:genre', 
     passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find({ 'Genre.Name': request.params.genre })
@@ -143,7 +143,7 @@ app.get('/movies/genre/:genre',
     })
 
 // Request: See movies by director
-app.get('/movies/director/:director', 
+app.get('/movies/directors/:director', 
         passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find({ 'Director.Name': request.params.director })
@@ -159,7 +159,7 @@ app.get('/movies/director/:director',
     })
 
 // Request: Registration
-app.post('/users/register',
+app.post('/users',
     [
         check('Username', 'Username is too short').isLength({ min: 5 }),
         check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
@@ -279,7 +279,7 @@ async (request, response) => {
 
 
 // Request: Delete specific users
-app.delete('/users/:username/deregister', passport.authenticate('jwt', { session: false }),
+app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         // this looks to see if there are any people with this username AND deletes it.
         await Users.findOneAndRemove({ Username: request.params.username })
