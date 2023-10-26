@@ -21,7 +21,7 @@ This is the API for my Jeriflix Client. It uses MongoDB in combination with Node
 
 ### Prerequisites
 
-To run the Simple JS Pokedex App, you need a web browser with JavaScript enabled, along with the dependencies listed under package.json: 
+To run this App, you need a web browser with JavaScript enabled, along with the dependencies listed under package.json: 
 
 "bcrypt": "^5.1.1",
 "body-parser": "^1.20.2",
