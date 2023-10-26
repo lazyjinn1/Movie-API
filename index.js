@@ -101,12 +101,12 @@ app.get('/movies',
             // if movies are found, it responds with a positive status code and a list of the 
             // movies written in Json
             .then((movies) => {
-                response.status(201).json(movies);
+                response.status(200).json(movies);
             })
             // if movies are not found, sends back an error.
             .catch((error) => {
                 console.error(error);
-                response.status(500).send('Error: ' + error.message);
+                response.status(404).send('Error: ' + error.message);
             });
     });
 
@@ -117,12 +117,12 @@ passport.authenticate('jwt', { session: false }),
         await Movies.findOne({ Title: request.params.title })
             // if a movie is found with the given title, said movie is returned.
             .then((movies) => {
-                response.status(201).json(movies);
+                response.status(200).json(movies);
             })
             // if no movies are found, sends back an error.
             .catch((error) => {
                 console.error(error);
-                response.status(500).send('Error: ' + error.message);
+                response.status(404).send('Error: ' + error.message);
             });
     })
 
@@ -138,7 +138,7 @@ app.get('/movies/genre/:genre',
             // if no movies are found, sends back an error.
             .catch((error) => {
                 console.error(error);
-                response.status(500).send('Error: ' + error.message);
+                response.status(404).send('Error: ' + error.message);
             })
     })
 
@@ -154,7 +154,7 @@ app.get('/movies/director/:director',
             // if no movies are found, sends back an error.
             .catch((error) => {
                 console.error(error);
-                response.status(500).send('Error: ' + error.message);
+                response.status(404).send('Error: ' + error.message);
             })
     })
 
@@ -205,7 +205,7 @@ app.get('/users', passport.authenticate('jwt', { session: false }),
             // if there are none, an error is sent.
             .catch((error) => {
                 console.error(error);
-                response.status(500).send('Error: ' + error.message);
+                response.status(404).send('Error: ' + error.message);
             });
     });
 
@@ -220,7 +220,7 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }),
             // otherwise, an error is sent.
             .catch((error) => {
                 console.error(error);
-                response.status(500).send('Error: ' + error.message);
+                response.status(404).send('Error: ' + error.message);
             });
     });
 
@@ -240,7 +240,7 @@ async (request, response) => {
         }
 
         if (request.user.Username !== request.params.username) {
-            return response.status(400).send('Permission denied');
+            return response.status(401).send('Permission denied');
         }
 
         // Check if the request body includes a new password.
@@ -289,7 +289,7 @@ app.delete('/users/:username/deregister', passport.authenticate('jwt', { session
                     response.status(404).send(request.params.username + ' was not found');
                 } else {
                     // If username IS found, then the username and document is deleted.
-                    response.status(200).send(request.params.username + ' was deleted.');
+                    response.status(204).send(request.params.username + ' was deleted.');
                 }
             })
             .catch((error) => {
@@ -316,7 +316,7 @@ app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { se
                 response.status(404).send(movie.Title + ' was not found in the database.');
                 // if movie does exist but is already in the user's Favorites list, then this error is sent.
             } else if (user.FavoriteMovies.includes(movie._id)) {
-                response.status(404).send(movie.Title + ' is already in your Favorites.');
+                response.status(400).send(movie.Title + ' is already in your Favorites.');
             } else {
                 // otherwise, it all goes through and a new movie is added to Favorites.
                 await Users.findOneAndUpdate({ Username: request.params.username }, {
@@ -325,7 +325,7 @@ app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { se
                     { new: true })
                 // this saves the data.
                 await user.save();
-                response.status(200).json(movie.Title + ' has been added to Favorites.');
+                response.status(201).json(movie.Title + ' has been added to Favorites.');
 
             }
 
@@ -363,7 +363,7 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
                     { new: true })
                 // saves the data.
                 await user.save();
-                response.status(200).json(movie.Title + ' has been removed from Favorites.');
+                response.status(204).json(movie.Title + ' has been removed from Favorites.');
 
             }
 
