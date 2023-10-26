@@ -95,7 +95,6 @@ app.get('/', (request, response) => {
 // if user loads into /movies, this returns the movies in JSON
 // Request: See all movies
 app.get('/movies', 
-    passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find()
             // if movies are found, it responds with a positive status code and a list of the 
