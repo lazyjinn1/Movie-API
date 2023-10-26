@@ -249,11 +249,14 @@ async (request, response) => {
             const hashedPassword = await Users.hashPassword(request.body.Password);
 
             // Update the user's password with the new hashed password.
-            await Users.findOneAndUpdate({ Username: request.params.username }, {
+            const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
                 $set: {
                     Password: hashedPassword,
                 }
-            });
+            },
+            { new: true });
+
+        response.json(updatedUser);
         }
 
         // Check if the request body has something else.
