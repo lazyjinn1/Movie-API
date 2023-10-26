@@ -111,7 +111,7 @@ app.get('/movies',
     });
 
 // Request: See specific movie details
-app.get('/movies/title/:title', 
+app.get('/movies/:title', 
 passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.findOne({ Title: request.params.title })
