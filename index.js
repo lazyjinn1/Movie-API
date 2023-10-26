@@ -287,10 +287,9 @@ app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
                 // if username is not found, then an error is sent.
                 if (!user) {
                     response.status(404).send(request.params.username + ' was not found.');
-                } else {
-                    // If username IS found, then the username and document is deleted.
-                    response.status(204).send('User was deleted.');
-                }
+                } 
+                // If username IS found, then the username and document is deleted.
+                response.status(204).send('User was deleted.');
             })
             .catch((error) => {
                 console.error(error);
