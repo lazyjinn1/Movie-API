@@ -115,7 +115,7 @@ app.get('/movies/title/:title',
 passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.findOne({ Title: request.params.title })
-            // if a movie is found with the given title, said movie is returned.
+            // if a movie is found with the given title, said   movie is returned.
             .then((movies) => {
                 response.status(200).json(movies);
             })
@@ -286,17 +286,18 @@ app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
             .then((user) => {
                 // if username is not found, then an error is sent.
                 if (!user) {
-                    response.status(404).send(request.params.username + ' was not found');
+                    response.status(404).send(request.params.username + ' was not found.');
                 } else {
                     // If username IS found, then the username and document is deleted.
-                    response.status(204).send(request.params.username + ' was deleted.');
+                    response.status(204).send('User was deleted.');
                 }
             })
             .catch((error) => {
                 console.error(error);
                 response.status(500).send('Error: ' + error.message);
             });
-    });
+    }
+);
 
 // Request: Add movie to favorites
 app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { session: false }),
