@@ -41,11 +41,10 @@ const app = express();
 // });
 
 // connects our server to the MongoDB Database ON ATLAS
-mongoose.connect(process.env.CONNECTION_URI + '/Jeriflix', {
+mongoose.connect(process.env.CONNECTION_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
-console.log(process.env.CONNECTION_URI);
 // list of origins that are allowed by CORS
 let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
 
