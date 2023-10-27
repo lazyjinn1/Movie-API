@@ -11,7 +11,7 @@ let generateJWTToken = (user) => {
         subject: user.Username, 
         //This specifies that the token will expire in 7 days.
         expiresIn: '7d',
-        //This is the algorith used to 'sign' or encode the values of the JWT 
+        //This is the algorithm used to 'sign' or encode the values of the JWT 
         algorithm: 'HS256' 
     });
 }
