@@ -45,7 +45,7 @@ mongoose.connect(process.env.CONNECTION_URI + '/Jeriflix', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
-
+console.log(process.env.CONNECTION_URI);
 // list of origins that are allowed by CORS
 let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
 
