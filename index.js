@@ -41,7 +41,7 @@ const app = express();
 // });
 
 // connects our server to the MongoDB Database ON ATLAS
-mongoose.connect('mongodb+srv://lazyjinn:Oq11K6DdA6GFtCTY@jinncluster.mgnrj93.mongodb.net/?retryWrites=true&w=majority', {
+mongoose.connect(process.env.CONNECTION_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
