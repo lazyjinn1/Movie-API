@@ -93,7 +93,7 @@ app.get('/', (request, response) => {
 
 // if user loads into /movies, this returns the movies in JSON
 // Request: See all movies
-app.get('/movies', 
+app.get('/movies', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find()
             // if movies are found, it responds with a positive status code and a list of the 
@@ -109,8 +109,7 @@ app.get('/movies',
     });
 
 // Request: See specific movie details
-app.get('/movies/:title', 
-passport.authenticate('jwt', { session: false }),
+app.get('/movies/:title', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.findOne({ Title: request.params.title })
             // if a movie is found with the given title, said movie is returned.
@@ -125,8 +124,7 @@ passport.authenticate('jwt', { session: false }),
     })
 
 // Request: See movies by genre
-app.get('/movies/genres/:genre', 
-    passport.authenticate('jwt', { session: false }),
+app.get('/movies/genres/:genre', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find({ 'Genre.Name': request.params.genre })
             // if movies are found with the given genre, said movies is returned.
@@ -141,8 +139,7 @@ app.get('/movies/genres/:genre',
     })
 
 // Request: See movies by director
-app.get('/movies/directors/:director', 
-        passport.authenticate('jwt', { session: false }),
+app.get('/movies/directors/:director', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find({ 'Director.Name': request.params.director })
             // if movies are found with the given director, said movies is returned.
