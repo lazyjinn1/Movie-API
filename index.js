@@ -41,7 +41,7 @@ const app = express();
 // });
 
 // connects our server to the MongoDB Database ON ATLAS
-mongoose.connect(process.env.CONNECTION_URI, {
+mongoose.connect(process.env.CONNECTION_URI + 'Jeriflix', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
