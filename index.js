@@ -46,7 +46,7 @@ mongoose.connect(process.env.CONNECTION_URI, {
     useUnifiedTopology: true
 });
 // list of origins that are allowed by CORS
-let allowedOrigins = ['http://localhost:1234', 'http://testsite.com', 'http://localhost:8080'];
+let allowedOrigins = ['http://localhost:1234', 'http://testsite.com', 'http://localhost:8080', 'https://jeriflix.onrender.com'];
 
 // launches CORS
 app.use(cors({
