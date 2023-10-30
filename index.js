@@ -46,23 +46,23 @@ mongoose.connect(process.env.CONNECTION_URI, {
     useUnifiedTopology: true
 });
 // list of origins that are allowed by CORS
-// let allowedOrigins = ['http://localhost:1234', 'http://testsite.com', 'http://localhost:8080', 'https://jeriflix.onrender.com'];
+let allowedOrigins = ['http://localhost:1234', 'http://testsite.com', 'http://localhost:8080', 'https://jeriflix.onrender.com'];
 
-// // launches CORS
-// app.use(cors({
-//     // this looks for what the origin is and the appropriate response
-//     origin: (origin, callback) => {
-//         // if there is NO origin, then it goes through
-//         if (!origin) return callback(null, true);
-//         // if the origin exists but does NOT match an origin in the allowedOrigins array, then this error happens
-//         if (allowedOrigins.indexOf(origin) === -1) {
-//             let message = 'The CORS policy for this application doesn\'t allow access from origin ' + origin;
-//             return callback(new Error(message), false);
-//         }
-//         // if it does match an origin in the allowedOrigins array, then it goes through.
-//         return callback(null, true);
-//     }
-// }));
+// launches CORS
+app.use(cors({
+    // this looks for what the origin is and the appropriate response
+    origin: (origin, callback) => {
+        // if there is NO origin, then it goes through
+        if (!origin) return callback(null, true);
+        // if the origin exists but does NOT match an origin in the allowedOrigins array, then this error happens
+        if (allowedOrigins.indexOf(origin) === -1) {
+            let message = 'The CORS policy for this application doesn\'t allow access from origin ' + origin;
+            return callback(new Error(message), false);
+        }
+        // if it does match an origin in the allowedOrigins array, then it goes through.
+        return callback(null, true);
+    }
+}));
 
 // parses data in the body of the document
 bodyParser = require('body-parser');
