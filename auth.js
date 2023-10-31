@@ -8,7 +8,7 @@ require('./passport');
 let generateJWTToken = (user) => {
     return jwt.sign(user, jwtSecret, {
         //This is the username you are encoding in the JWT
-        subject: user.Username, 
+        subject: user.username, 
         //This specifies that the token will expire in 7 days.
         expiresIn: '7d',
         //This is the algorithm used to 'sign' or encode the values of the JWT 
@@ -25,7 +25,7 @@ module.exports = (router) => {
             if (error || !user) {
                 return response.status(400).json({
                     message: 'Something is not right.',
-                    user:user
+                    user: user
                 });
             }
             // if the user exists and there is not currently a session going, then this goes through

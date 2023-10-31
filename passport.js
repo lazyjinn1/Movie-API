@@ -14,8 +14,8 @@ passport.use(
     // LocalStrategy looks for just Username and Password
     new LocalStrategy(
         {   
-            usernameField: 'Username',
-            passwordField: 'Password',
+            Username: 'Username',
+            Password: 'Password',
         },
         // this looks to see if said username is found in the database
         async (username, password, callback) => {
