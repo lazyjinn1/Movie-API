@@ -1,28 +1,26 @@
-// defining express to a variable. Express is used as a way to make writing node easier
-const express = require('express');
+const express = require("express"),
+    mongoose = require("mongoose"),
+    Models = require("./models.js"),
+    bodyParser = require("body-parser"),
+    path = require("path"),
+    cors = require("cors");
+// defining a variable app as express's many functions
+const app = express();
 
-// defining mongoose which is an object data modeling (ODM) library that allows you to 
-// utilize and work with the data stored in MongoDB (our database)
-const mongoose = require('mongoose');
 
-// defines cors. CORS = Cross Origin Resource Sharing. Allows you to extend HTTP requests.
-const cors = require('cors');
-
-// connects us to our models.js file which is where our different Schemas for our Movies and Users are
-const Models = require('./models.js');
-
-// imports our models.js file where our different Schemas for our Movies and Users are
-const { Movie } = require('./models');
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 // defines express-validator and what we're using from it.
 const { check, validationResult } = require('express-validator');
+// importing the auth.js file.
+let auth = require('./auth.js')(app);
 
-// defines the port that we are going to listen to for the server. Currently defining a pre-configured port
-// number in the environment variable.
-const port = process.env.PORT;
+//importing the passport.js file.
+const passport = require('passport');
+require('./passport');
 
 // If you want to connect locally:
-// const port = 8080;
+const port = 8080;
 
 // defines a Movies variable that relates to each movie in the Models' Movie Schema.
 const Movies = Models.Movie;
@@ -30,17 +28,13 @@ const Movies = Models.Movie;
 // defines a USers variable that relates to each user in the Models' User Schema.
 const Users = Models.User;
 
-// defining a variable app as express's many functions
-const app = express();
-
-
 // connects our server to the MongoDB Database LOCALLY
-// mongoose.connect('mongodb://127.0.0.1:27017/test', { 
-//     useNewUrlParser: true, 
+// mongoose.connect('http://localhost:12017', {
+//     useNewUrlParser: true,
 //     useUnifiedTopology: true
 // });
 
-// connects our server to the MongoDB Database ON ATLAS
+//connects our server to the MongoDB Database ON ATLAS
 mongoose.connect(process.env.CONNECTION_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -64,24 +58,7 @@ app.use(cors({
     }
 }));
 
-// parses data in the body of the document
-bodyParser = require('body-parser');
 
-// uses bodyParser's urlencoded function.
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// importing the auth.js file.
-let auth = require('./auth.js')(app);
-
-//importing the passport.js file.
-const passport = require('passport');
-require('./passport');
-
-// defining path. path is the last part of the url
-path = require('path');
-
-// activates bodyParser
-app.use(bodyParser.json());
 
 // activates the ability to use public folders using express
 app.use(express.static('public'));
@@ -220,57 +197,57 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }),
     });
 
 // Request: Change Account Information
-app.put('/users/:username', 
-[check('Username', 'Username is too short').isLength({ min: 5 }).optional({ checkFalsy: true }),
-check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric().optional({ checkFalsy: true }),
-check('Email', 'Email is invalid').isEmail().optional({ checkFalsy: true }),
-check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
-], 
-passport.authenticate('jwt', { session: false }), 
-async (request, response) => {
-    try {
-        const errors = validationResult(request);
-        if (!errors.isEmpty()) {
-            return response.status(422).json({ errors: errors.array() });
-        }
+app.put('/users/:username',
+    [check('Username', 'Username is too short').isLength({ min: 5 }).optional({ checkFalsy: true }),
+    check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric().optional({ checkFalsy: true }),
+    check('Email', 'Email is invalid').isEmail().optional({ checkFalsy: true }),
+    check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
+    ],
+    passport.authenticate('jwt', { session: false }),
+    async (request, response) => {
+        try {
+            const errors = validationResult(request);
+            if (!errors.isEmpty()) {
+                return response.status(422).json({ errors: errors.array() });
+            }
 
-        if (request.user.Username !== request.params.username) {
-            return response.status(401).send('Permission denied');
-        }
+            if (request.user.Username !== request.params.username) {
+                return response.status(401).send('Permission denied');
+            }
 
-        // Check if the request body includes a new password.
-        if (request.body.Password) {
-            // If a new password is provided, hash it.
-            const hashedPassword = await Users.hashPassword(request.body.Password);
+            // Check if the request body includes a new password.
+            if (request.body.Password) {
+                // If a new password is provided, hash it.
+                const hashedPassword = await Users.hashPassword(request.body.Password);
 
-            // Update the user's password with the new hashed password.
+                // Update the user's password with the new hashed password.
+                const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
+                    $set: {
+                        Password: hashedPassword,
+                    }
+                },
+                    { new: true });
+
+                response.json(updatedUser);
+            }
+
+            // Check if the request body has something else.
             const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
                 $set: {
-                    Password: hashedPassword,
+                    Username: request.body.Username,
+                    Email: request.body.Email,
+                    Birthday: request.body.Birthday
                 }
             },
-            { new: true });
 
-        response.json(updatedUser);
+                { new: true });
+
+            response.json(updatedUser);
+        } catch (error) {
+            console.error(error);
+            response.status(500).send('Error: ' + error.message);
         }
-
-        // Check if the request body has something else.
-        const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
-            $set: {
-                Username: request.body.Username,
-                Email: request.body.Email,
-                Birthday: request.body.Birthday
-            }
-        }, 
-        
-        { new: true });
-
-        response.json(updatedUser);
-    } catch (error) {
-        console.error(error);
-        response.status(500).send('Error: ' + error.message);
-    }
-});
+    });
 
 
 // Request: Delete specific users
