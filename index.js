@@ -7,11 +7,13 @@ const express = require("express"),
 // defining a variable app as express's many functions
 const app = express();
 
-
+// uses body Parser, which allows you to read from the body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 // defines express-validator and what we're using from it.
 const { check, validationResult } = require('express-validator');
+
 // importing the auth.js file.
 let auth = require('./auth.js')(app);
 
@@ -57,8 +59,6 @@ app.use(cors({
         return callback(null, true);
     }
 }));
-
-
 
 // activates the ability to use public folders using express
 app.use(express.static('public'));
