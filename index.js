@@ -204,50 +204,25 @@ app.put('/users/:username',
     check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
     ],
     passport.authenticate('jwt', { session: false }),
-    async (request, response) => {
-        try {
-            const errors = validationResult(request);
-            if (!errors.isEmpty()) {
-                return response.status(422).json({ errors: errors.array() });
+        (request, response) => {
+            if (response.user.username !== request.params.username) {
+              return response.status(400).send('Permission denied')
             }
-
-            if (request.user.Username !== request.params.username) {
-                return response.status(401).send('Permission denied');
-            }
-
-            // Check if the request body includes a new password.
-            if (request.body.Password) {
-                // If a new password is provided, hash it.
-                const hashedPassword = await Users.hashPassword(request.body.Password);
-
-                // Update the user's password with the new hashed password.
-                const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
-                    $set: {
-                        Password: hashedPassword,
-                    }
-                },
-                    { new: true });
-
-                response.json(updatedUser);
-            }
-
-            // Check if the request body has something else.
-            const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
-                $set: {
-                    Username: request.body.Username,
-                    Email: request.body.Email,
-                    Birthday: request.body.Birthday
-                }
-            },
-
-                { new: true });
-
-            response.json(updatedUser);
-        } catch (error) {
-            console.error(error);
-            response.status(500).send('Error: ' + error.message);
-        }
-    });
+            let hashedPassword = Users.hashPassword(request.body.password);
+            Users.findOneAndUpdate(
+              {name: request.params.name},
+              {$set: {
+                username: request.body.usname,
+                password: hashedPassword,
+                email: request.body.email,
+                birthday: request.body.birthday
+              }},
+              {new: true}).then((updatedUser) => {
+                response.json(updatedUser)}).catch((error) => {
+                    console.error(error);
+                    response.status(500).send('Error ' + error)
+                })
+          });
 
 
 // Request: Delete specific users
