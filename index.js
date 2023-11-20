@@ -212,10 +212,10 @@ app.put('/users/:username',
             Users.findOneAndUpdate(
               {name: request.params.name},
               {$set: {
-                username: request.body.usname,
-                password: hashedPassword,
-                email: request.body.email,
-                birthday: request.body.birthday
+                Username: request.body.usname,
+                Password: hashedPassword,
+                Email: request.body.email,
+                Birthday: request.body.birthday
               }},
               {new: true}).then((updatedUser) => {
                 response.json(updatedUser)}).catch((error) => {
