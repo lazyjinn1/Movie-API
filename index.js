@@ -204,25 +204,29 @@ app.put('/users/:username',
     check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
     ],
     passport.authenticate('jwt', { session: false }),
-        (request, response) => {
-            if (response.user.username !== request.params.username) {
-              return response.status(400).send('Permission denied')
-            }
-            let hashedPassword = Users.hashPassword(request.body.password);
-            Users.findOneAndUpdate(
-              {name: request.params.name},
-              {$set: {
-                Username: request.body.usname,
-                Password: hashedPassword,
-                Email: request.body.email,
-                Birthday: request.body.birthday
-              }},
-              {new: true}).then((updatedUser) => {
-                response.json(updatedUser)}).catch((error) => {
-                    console.error(error);
-                    response.status(500).send('Error ' + error)
-                })
-          });
+    (request, response) => {
+        if (response.user.username !== request.params.username) {
+            return response.status(400).send('Permission denied')
+        }
+        let hashedPassword = Users.hashPassword(request.body.password);
+        Users.findOneAndUpdate(
+            { username: request.params.username },
+            {
+                $set: {
+                    Username: request.body.username,
+                    Password: hashedPassword,
+                    Email: request.body.email,
+                    Birthday: request.body.birthday
+                }
+            },
+            { new: true }).then((updatedUser) => {
+                response.json(updatedUser)
+            }).catch((error) => {
+                console.error(error);
+                response.status(500).send('Error ' + error)
+            })
+    }
+);
 
 
 // Request: Delete specific users
