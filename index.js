@@ -206,6 +206,7 @@ app.put('/users/:username',
     passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         try {
+            const hashedPassword = await Users.hashPassword(request.body.Password);
             const errors = validationResult(request);
             if (!errors.isEmpty()) {
                 return response.status(422).json({ errors: errors.array() });
@@ -215,26 +216,11 @@ app.put('/users/:username',
                 return response.status(401).send('Permission denied');
             }
 
-            // Check if the request body includes a new password.
-            if (request.body.Password) {
-                // If a new password is provided, hash it.
-                const hashedPassword = await Users.hashPassword(request.body.Password);
-
-                // Update the user's password with the new hashed password.
-                const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
-                    $set: {
-                        Password: hashedPassword,
-                    }
-                },
-                    { new: true });
-
-                response.json(updatedUser);
-            }
-
             // Check if the request body has something else.
             const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
                 $set: {
                     Username: request.body.Username,
+                    Password: hashedPassword,
                     Email: request.body.Email,
                     Birthday: request.body.Birthday
                 }
