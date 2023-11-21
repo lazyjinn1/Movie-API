@@ -71,8 +71,8 @@ app.get('/', (request, response) => {
 // if user loads into /movies, this returns the movies in JSON
 // Request: See all movies
 app.get('/movies', passport.authenticate('jwt', { session: false }),
-    async (request, response) => {
-        await Movies.find()
+    (request, response) => {
+        Movies.find()
             // if movies are found, it responds with a positive status code and a list of the 
             // movies written in Json
             .then((movies) => {
@@ -87,8 +87,8 @@ app.get('/movies', passport.authenticate('jwt', { session: false }),
 
 // Request: See specific movie details
 app.get('/movies/:title', passport.authenticate('jwt', { session: false }),
-    async (request, response) => {
-        await Movies.findOne({ Title: request.params.title })
+     (request, response) => {
+         Movies.findOne({ Title: request.params.title })
             // if a movie is found with the given title, said movie is returned.
             .then((movies) => {
                 response.status(200).json(movies);
@@ -102,8 +102,8 @@ app.get('/movies/:title', passport.authenticate('jwt', { session: false }),
 
 // Request: See movies by genre
 app.get('/movies/genres/:genre', passport.authenticate('jwt', { session: false }),
-    async (request, response) => {
-        await Movies.find({ 'Genre.Name': request.params.genre })
+     (request, response) => {
+         Movies.find({ 'Genre.Name': request.params.genre })
             // if movies are found with the given genre, said movies is returned.
             .then((movie) => {
                 response.json(movie);
@@ -117,8 +117,8 @@ app.get('/movies/genres/:genre', passport.authenticate('jwt', { session: false }
 
 // Request: See movies by director
 app.get('/movies/directors/:director', passport.authenticate('jwt', { session: false }),
-    async (request, response) => {
-        await Movies.find({ 'Director.Name': request.params.director })
+     (request, response) => {
+         Movies.find({ 'Director.Name': request.params.director })
             // if movies are found with the given director, said movies is returned.
             .then((movie) => {
                 response.json(movie);
@@ -137,20 +137,20 @@ app.post('/users',
         check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
         check('Password', 'Password cannot be empty').not().isEmpty(),
         check('Email', 'Email is invalid').isEmail()
-    ], async (request, response) => {
+    ],  (request, response) => {
         try {
             const errors = validationResult(request);
             if (!errors.isEmpty()) {
                 return response.status(422).json({ errors: errors.array() });
             }
 
-            const existingUser = await Users.findOne({ Username: request.body.Username });
+            const existingUser =  Users.findOne({ Username: request.body.Username });
             if (existingUser) {
                 return response.status(400).send(request.body.Username + ' already exists');
             }
 
-            const hashedPassword = await Users.hashPassword(request.body.Password);
-            await Users.create({
+            const hashedPassword =  Users.hashPassword(request.body.Password);
+             Users.create({
                 Username: request.body.Username,
                 Password: hashedPassword,
                 Email: request.body.Email,
@@ -168,8 +168,8 @@ app.post('/users',
 
 //Request: See all users
 app.get('/users', passport.authenticate('jwt', { session: false }),
-    async (request, response) => {
-        await Users.find()
+     (request, response) => {
+         Users.find()
             // if there are users to be found, this will bring you to all of them.
             .then((users) => {
                 response.status(201).json(users);
@@ -183,8 +183,8 @@ app.get('/users', passport.authenticate('jwt', { session: false }),
 
 // Request: See specific users
 app.get('/users/:username', passport.authenticate('jwt', { session: false }),
-    async (request, response) => {
-        await Users.findOne({ Username: request.params.username })
+     (request, response) => {
+         Users.findOne({ Username: request.params.username })
             // If this username exist in the database, this returns their info.
             .then((user) => {
                 response.json(user);
@@ -231,9 +231,9 @@ app.put('/users/:username',
 
 // Request: Delete specific users
 app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
-    async (request, response) => {
+    (request, response) => {
         // this looks to see if there are any people with this username AND deletes it.
-        await Users.findOneAndRemove({ Username: request.params.username })
+         Users.findOneAndRemove({ Username: request.params.username })
             .then((user) => {
                 // if username is not found, then an error is sent.
                 if (!user) {
@@ -251,16 +251,16 @@ app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
 
 // Request: Add movie to favorites
 app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { session: false }),
-    async (request, response) => {
+    (request, response) => {
         try {
             // defines user as someone in the Users database with the username stated in :username
-            const user = await Users.findOne({ Username: request.params.username })
+            const user = Users.findOne({ Username: request.params.username })
             // checks to see if the User is IN the database.
             if (!user) {
                 return response.status(404).send('User not found.');
             }
             //defines movie as a movie with the movieID in :movieID
-            const movie = await Movies.findOne({ _id: request.params.movieID })
+            const movie = Movies.findOne({ _id: request.params.movieID })
 
 
             if (!movie) {
@@ -270,12 +270,12 @@ app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { se
                 response.status(400).send(movie.Title + ' is already in your Favorites.');
             } else {
                 // otherwise, it all goes through and a new movie is added to Favorites.
-                await Users.findOneAndUpdate({ Username: request.params.username }, {
+                Users.findOneAndUpdate({ Username: request.params.username }, {
                     $push: { FavoriteMovies: request.params.movieID }
                 },
                     { new: true })
                 // this saves the data.
-                await user.save();
+                user.save();
                 response.status(201).json(movie.Title + ' has been added to Favorites.');
 
             }
@@ -289,17 +289,17 @@ app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { se
 
 // Request: Remove movie from favorites
 app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', { session: false }),
-    async (request, response) => {
+    (request, response) => {
         try {
             // defines user as someone in the Users database with the username stated in :username
-            const user = await Users.findOne({ Username: request.params.username })
+            const user =  Users.findOne({ Username: request.params.username })
             // if user does not exist then an error will occur.
             if (!user) {
                 return response.status(404).send('User not found.');
             }
 
             //defines movie as a movie with the movieID in :movieID
-            const movie = await Movies.findOne({ _id: request.params.movieID })
+            const movie =  Movies.findOne({ _id: request.params.movieID })
 
             if (!movie) {
                 response.status(404).send(movie.Title + ' was not found in the database.');
@@ -308,12 +308,12 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
                 response.status(404).send(movie.Title + ' was not found in your Favorites.');
             } else {
                 // otherwise, this pulls the old movie id away and removes it from your Favorites List.
-                await Users.findOneAndUpdate({ Username: request.params.username }, {
+                 Users.findOneAndUpdate({ Username: request.params.username }, {
                     $pull: { FavoriteMovies: request.params.movieID }
                 },
                     { new: true })
                 // saves the data.
-                await user.save();
+                 user.save();
                 response.status(204).json(movie.Title + ' has been removed from Favorites.');
 
             }
