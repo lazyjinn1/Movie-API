@@ -205,7 +205,7 @@ app.put('/users/:username',
     ],
     passport.authenticate('jwt', { session: false }),
     (request, response) => {
-        if (response.user.username !== request.params.username) {
+        if (request.user.username !== request.params.username) {
             return response.status(400).send('Permission denied')
         }
         let hashedPassword = Users.hashPassword(request.body.password);
