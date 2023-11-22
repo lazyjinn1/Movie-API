@@ -152,7 +152,7 @@ app.post('/users',
 
             let hashedPassword =  Users.hashPassword(request.body.password);
             Users.create({
-                username: request.body.username,
+                Username: request.body.username,
                 Password: hashedPassword,
                 Email: request.body.email,
                 Birthday: request.body.birthday
@@ -223,6 +223,7 @@ app.put('/users/:username',
             { new: true }).then((updatedUser) => { 
                 response.json(updatedUser)
             }).catch((error) => {
+                console.log(Users);
                 console.error(error);
                 response.status(500).send({'Error ': error, "errorResponse" : response} );
             })
