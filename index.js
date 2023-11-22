@@ -133,7 +133,7 @@ app.get('/movies/directors/:director', passport.authenticate('jwt', { session: f
 // Request: Registration
 app.post('/users', 
     [
-        check('Username', 'Username is too short').isLength({ min: 5 }),
+        check('Username', 'Username is too short').isLength({ min: 6 }),
         check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
         check('Password', 'Password cannot be empty').not().isEmpty(),
         check('Email', 'Email is invalid').isEmail()
@@ -147,6 +147,7 @@ app.post('/users',
             let existingUser =  Users.findOne({ Username: request.body.username });
             
             if (existingUser) {
+                console.log(existingUser);
                 return response.status(400).send(request.body.username + ' already exists');
             }
 
