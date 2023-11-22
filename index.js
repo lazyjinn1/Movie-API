@@ -136,13 +136,13 @@ app.post("/users", [
     check('Username', 'Username contains non alphanumric characters - not allowed.').isAlphanumeric(),
     check('Password', 'Password is required').not().isEmpty(),
     check('Email', 'Email does not appear to be vaild').isEmail()
-], async (request, response) => {
+], (request, response) => {
     let errors = validationResult(request)
     if (!errors.isEmpty()) {
         return response.status(422).json({ errors: errors.array() })
     }
     let hashedPassword = Users.hashPassword(request.body.password);
-    await Users.findOne({ Username: request.body.username })
+    Users.findOne({ Username: request.body.username })
         .then((user) => {
             if (user) {
                 return response.status(400).send(request.body.username + ' already exists')
