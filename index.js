@@ -146,7 +146,7 @@ app.post('/users',
 
             const existingUser =  Users.findOne({ Username: request.body.Username });
             if (existingUser) {
-                return response.status(400).send(request.body.Username + ' already exists');
+                return response.status(400).send(request.body.Username + ' already exists', request.body.fullErrorLogs + errors);
             }
 
             const hashedPassword =  Users.hashPassword(request.body.Password);
