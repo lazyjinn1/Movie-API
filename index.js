@@ -1,28 +1,28 @@
-// defining express to a variable. Express is used as a way to make writing node easier
-const express = require('express');
+const express = require("express"),
+    mongoose = require("mongoose"),
+    Models = require("./models.js"),
+    bodyParser = require("body-parser"),
+    path = require("path"),
+    cors = require("cors");
+// defining a variable app as express's many functions
+const app = express();
 
-// defining mongoose which is an object data modeling (ODM) library that allows you to 
-// utilize and work with the data stored in MongoDB (our database)
-const mongoose = require('mongoose');
-
-// defines cors. CORS = Cross Origin Resource Sharing. Allows you to extend HTTP requests.
-const cors = require('cors');
-
-// connects us to our models.js file which is where our different Schemas for our Movies and Users are
-const Models = require('./models.js');
-
-// imports our models.js file where our different Schemas for our Movies and Users are
-const { Movie } = require('./models');
+// uses body Parser, which allows you to read from the body
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // defines express-validator and what we're using from it.
 const { check, validationResult } = require('express-validator');
 
-// defines the port that we are going to listen to for the server. Currently defining a pre-configured port
-// number in the environment variable.
-const port = process.env.PORT;
+// importing the auth.js file.
+let auth = require('./auth.js')(app);
+
+//importing the passport.js file.
+const passport = require('passport');
+require('./passport');
 
 // If you want to connect locally:
-// const port = 8080;
+const port = 8080;
 
 // defines a Movies variable that relates to each movie in the Models' Movie Schema.
 const Movies = Models.Movie;
@@ -30,17 +30,13 @@ const Movies = Models.Movie;
 // defines a USers variable that relates to each user in the Models' User Schema.
 const Users = Models.User;
 
-// defining a variable app as express's many functions
-const app = express();
-
-
 // connects our server to the MongoDB Database LOCALLY
-// mongoose.connect('mongodb://127.0.0.1:27017/test', { 
-//     useNewUrlParser: true, 
+// mongoose.connect('http://localhost:12017', {
+//     useNewUrlParser: true,
 //     useUnifiedTopology: true
 // });
 
-// connects our server to the MongoDB Database ON ATLAS
+//connects our server to the MongoDB Database ON ATLAS
 mongoose.connect(process.env.CONNECTION_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -64,25 +60,6 @@ app.use(cors({
     }
 }));
 
-// parses data in the body of the document
-bodyParser = require('body-parser');
-
-// uses bodyParser's urlencoded function.
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// importing the auth.js file.
-let auth = require('./auth.js')(app);
-
-//importing the passport.js file.
-const passport = require('passport');
-require('./passport');
-
-// defining path. path is the last part of the url
-path = require('path');
-
-// activates bodyParser
-app.use(bodyParser.json());
-
 // activates the ability to use public folders using express
 app.use(express.static('public'));
 
@@ -94,8 +71,8 @@ app.get('/', (request, response) => {
 // if user loads into /movies, this returns the movies in JSON
 // Request: See all movies
 app.get('/movies', passport.authenticate('jwt', { session: false }),
-    (request, response) => {
-        Movies.find()
+    async (request, response) => {
+        await Movies.find()
             // if movies are found, it responds with a positive status code and a list of the 
             // movies written in Json
             .then((movies) => {
@@ -110,8 +87,8 @@ app.get('/movies', passport.authenticate('jwt', { session: false }),
 
 // Request: See specific movie details
 app.get('/movies/:title', passport.authenticate('jwt', { session: false }),
-    (request, response) => {
-        Movies.findOne({ Title: request.params.title })
+    async (request, response) => {
+        await Movies.findOne({ Title: request.params.title })
             // if a movie is found with the given title, said movie is returned.
             .then((movies) => {
                 response.status(200).json(movies);
@@ -125,8 +102,8 @@ app.get('/movies/:title', passport.authenticate('jwt', { session: false }),
 
 // Request: See movies by genre
 app.get('/movies/genres/:genre', passport.authenticate('jwt', { session: false }),
-    (request, response) => {
-        Movies.find({ 'Genre.Name': request.params.genre })
+    async (request, response) => {
+        await Movies.find({ 'Genre.Name': request.params.genre })
             // if movies are found with the given genre, said movies is returned.
             .then((movie) => {
                 response.json(movie);
@@ -140,8 +117,8 @@ app.get('/movies/genres/:genre', passport.authenticate('jwt', { session: false }
 
 // Request: See movies by director
 app.get('/movies/directors/:director', passport.authenticate('jwt', { session: false }),
-    (request, response) => {
-        Movies.find({ 'Director.Name': request.params.director })
+    async (request, response) => {
+        await Movies.find({ 'Director.Name': request.params.director })
             // if movies are found with the given director, said movies is returned.
             .then((movie) => {
                 response.json(movie);
@@ -154,46 +131,45 @@ app.get('/movies/directors/:director', passport.authenticate('jwt', { session: f
     })
 
 // Request: Registration
-app.post("/users", [
-    check('Username', 'Username is required').isLength({ min: 5 }),
-    check('Username', 'Username contains non alphanumric characters - not allowed.').isAlphanumeric(),
-    check('Password', 'Password is required').not().isEmpty(),
-    check('Email', 'Email does not appear to be vaild').isEmail()
-], (request, response) => {
-    let errors = validationResult(request)
-    if (!errors.isEmpty()) {
-        return response.status(422).json({ errors: errors.array() })
-    }
-    let hashedPassword = Users.hashPassword(request.body.password);
-    Users.findOne({ Username: request.body.username })
-        .then((user) => {
-            if (user) {
-                return response.status(400).send(request.body.username + ' already exists')
-            } else {
-                Users.create({
-                    Username: request.body.username,
-                    Password: hashedPassword,
-                    Email: request.body.email,
-                    Birthday: request.body.birthday
-                }).then((user) => {
-                    response.status(201).json(user)
-                }).catch((error) => {
-                    console.error(error);
-                    response.status(500).send('Error ' + error)
-                })
+app.post('/users',
+    [
+        check('Username', 'Username is too short').isLength({ min: 5 }),
+        check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
+        check('Password', 'Password cannot be empty').not().isEmpty(),
+        check('Email', 'Email is invalid').isEmail()
+    ], async (request, response) => {
+        try {
+            const errors = validationResult(request);
+            if (!errors.isEmpty()) {
+                return response.status(422).json({ errors: errors.array() });
             }
-        })
-        .catch((error) => {
-            console.error(error)
-            response.status(500).send('Error ' + error)
-        })
-});
+
+            const existingUser = await Users.findOne({ Username: request.body.Username });
+            if (existingUser) {
+                return response.status(400).send(request.body.Username + ' already exists');
+            }
+
+            const hashedPassword = await Users.hashPassword(request.body.Password);
+            await Users.create({
+                Username: request.body.Username,
+                Password: hashedPassword,
+                Email: request.body.Email,
+                Birthday: request.body.Birthday
+            });
+
+            response.status(201).send(request.body.Username + ' has been successfully registered!');
+        } catch (error) {
+            console.error(error);
+            response.status(500).send('Error: ' + error.message);
+        }
+    }
+);
 
 
 //Request: See all users
 app.get('/users', passport.authenticate('jwt', { session: false }),
-    (request, response) => {
-        Users.find()
+    async (request, response) => {
+        await Users.find()
             // if there are users to be found, this will bring you to all of them.
             .then((users) => {
                 response.status(201).json(users);
@@ -207,8 +183,8 @@ app.get('/users', passport.authenticate('jwt', { session: false }),
 
 // Request: See specific users
 app.get('/users/:username', passport.authenticate('jwt', { session: false }),
-    (request, response) => {
-        Users.findOne({ Username: request.params.username })
+    async (request, response) => {
+        await Users.findOne({ Username: request.params.username })
             // If this username exist in the database, this returns their info.
             .then((user) => {
                 response.json(user);
@@ -221,64 +197,64 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }),
     });
 
 // Request: Change Account Information
-app.put('/users/:username', 
-[check('Username', 'Username is too short').isLength({ min: 5 }).optional({ checkFalsy: true }),
-check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric().optional({ checkFalsy: true }),
-check('Email', 'Email is invalid').isEmail().optional({ checkFalsy: true }),
-check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
-], 
-passport.authenticate('jwt', { session: false }), 
-async (request, response) => {
-    try {
-        const errors = validationResult(request);
-        if (!errors.isEmpty()) {
-            return response.status(422).json({ errors: errors.array() });
-        }
+app.put('/users/:username',
+    [check('Username', 'Username is too short').isLength({ min: 5 }).optional({ checkFalsy: true }),
+    check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric().optional({ checkFalsy: true }),
+    check('Email', 'Email is invalid').isEmail().optional({ checkFalsy: true }),
+    check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
+    ],
+    passport.authenticate('jwt', { session: false }),
+    async (request, response) => {
+        try {
+            const errors = validationResult(request);
+            if (!errors.isEmpty()) {
+                return response.status(422).json({ errors: errors.array() });
+            }
 
-        if (request.user.Username !== request.params.username) {
-            return response.status(401).send('Permission denied');
-        }
+            if (request.user.Username !== request.params.username) {
+                return response.status(401).send('Permission denied');
+            }
 
-        // Check if the request body includes a new password.
-        if (request.body.Password) {
-            // If a new password is provided, hash it.
-            const hashedPassword = await Users.hashPassword(request.body.Password);
+            // Check if the request body includes a new password.
+            if (request.body.Password) {
+                // If a new password is provided, hash it.
+                const hashedPassword = await Users.hashPassword(request.body.Password);
 
-            // Update the user's password with the new hashed password.
+                // Update the user's password with the new hashed password.
+                const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
+                    $set: {
+                        Password: hashedPassword,
+                    }
+                },
+                    { new: true });
+
+                response.json(updatedUser);
+            }
+
+            // Check if the request body has something else.
             const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
                 $set: {
-                    Password: hashedPassword,
+                    Username: request.body.Username,
+                    Email: request.body.Email,
+                    Birthday: request.body.Birthday
                 }
             },
-            { new: true });
 
-        response.json(updatedUser);
+                { new: true });
+
+            response.json(updatedUser);
+        } catch (error) {
+            console.error(error);
+            response.status(500).send('Error: ' + error.message);
         }
-
-        // Check if the request body has something else.
-        const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
-            $set: {
-                Username: request.body.Username,
-                Email: request.body.Email,
-                Birthday: request.body.Birthday
-            }
-        }, 
-        
-        { new: true });
-
-        response.json(updatedUser);
-    } catch (error) {
-        console.error(error);
-        response.status(500).send('Error: ' + error.message);
-    }
-});
+    });
 
 
 // Request: Delete specific users
 app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
-    (request, response) => {
+    async (request, response) => {
         // this looks to see if there are any people with this username AND deletes it.
-        Users.findOneAndRemove({ Username: request.params.username })
+        await Users.findOneAndRemove({ Username: request.params.username })
             .then((user) => {
                 // if username is not found, then an error is sent.
                 if (!user) {
@@ -296,16 +272,16 @@ app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
 
 // Request: Add movie to favorites
 app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { session: false }),
-    (request, response) => {
+    async (request, response) => {
         try {
             // defines user as someone in the Users database with the username stated in :username
-            const user = Users.findOne({ Username: request.params.username })
+            const user = await Users.findOne({ Username: request.params.username })
             // checks to see if the User is IN the database.
             if (!user) {
                 return response.status(404).send('User not found.');
             }
             //defines movie as a movie with the movieID in :movieID
-            const movie = Movies.findOne({ _id: request.params.movieID })
+            const movie = await Movies.findOne({ _id: request.params.movieID })
 
 
             if (!movie) {
@@ -315,12 +291,12 @@ app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { se
                 response.status(400).send(movie.Title + ' is already in your Favorites.');
             } else {
                 // otherwise, it all goes through and a new movie is added to Favorites.
-                Users.findOneAndUpdate({ Username: request.params.username }, {
+                await Users.findOneAndUpdate({ Username: request.params.username }, {
                     $push: { FavoriteMovies: request.params.movieID }
                 },
                     { new: true })
                 // this saves the data.
-                user.save();
+                await user.save();
                 response.status(201).json(movie.Title + ' has been added to Favorites.');
 
             }
@@ -334,17 +310,17 @@ app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { se
 
 // Request: Remove movie from favorites
 app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', { session: false }),
-    (request, response) => {
+    async (request, response) => {
         try {
             // defines user as someone in the Users database with the username stated in :username
-            const user = Users.findOne({ Username: request.params.username })
+            const user = await Users.findOne({ Username: request.params.username })
             // if user does not exist then an error will occur.
             if (!user) {
                 return response.status(404).send('User not found.');
             }
 
             //defines movie as a movie with the movieID in :movieID
-            const movie = Movies.findOne({ _id: request.params.movieID })
+            const movie = await Movies.findOne({ _id: request.params.movieID })
 
             if (!movie) {
                 response.status(404).send(movie.Title + ' was not found in the database.');
@@ -353,12 +329,12 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
                 response.status(404).send(movie.Title + ' was not found in your Favorites.');
             } else {
                 // otherwise, this pulls the old movie id away and removes it from your Favorites List.
-                Users.findOneAndUpdate({ Username: request.params.username }, {
+                await Users.findOneAndUpdate({ Username: request.params.username }, {
                     $pull: { FavoriteMovies: request.params.movieID }
                 },
                     { new: true })
                 // saves the data.
-                user.save();
+                await user.save();
                 response.status(204).json(movie.Title + ' has been removed from Favorites.');
 
             }
