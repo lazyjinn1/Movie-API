@@ -147,13 +147,12 @@ app.post('/users',
             let existingUser =  Users.findOne({ Username: request.body.username });
             
             if (existingUser) {
-                console.log(existingUser);
                 return response.status(400).send(request.body.username + ' already exists');
             }
 
             let hashedPassword =  Users.hashPassword(request.body.password);
             Users.create({
-                Username: request.body.username,
+                username: request.body.username,
                 Password: hashedPassword,
                 Email: request.body.email,
                 Birthday: request.body.birthday
