@@ -145,7 +145,9 @@ app.post('/users',
             }
 
             const existingUser =  Users.findOne({ Username: request.body.username });
+            
             if (existingUser) {
+                console.log(existingUser);
                 return response.status(400).send(request.body.username + ' already exists');
             }
 
