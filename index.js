@@ -144,13 +144,13 @@ app.post('/users',
                 return response.status(422).json({ errors: errors.array() });
             }
 
-            const existingUser =  Users.findOne({ Username: request.body.Username });
+            const existingUser =  Users.findOne({ Username: request.body.username });
             if (existingUser) {
-                return response.status(400).send(request.body.Username + ' already exists', request.body.fullErrorLogs + errors);
+                return response.status(400).send(request.body.username + ' already exists', request.body.fullErrorLogs + errors);
             }
 
             const hashedPassword =  Users.hashPassword(request.body.password);
-             Users.create({
+            Users.create({
                 Username: request.body.username,
                 Password: hashedPassword,
                 Email: request.body.email,
@@ -205,7 +205,7 @@ app.put('/users/:username',
     ],
     passport.authenticate('jwt', { session: false }),
     (request, response) => {
-        if (request.user.username !== request.params.username) {
+        if (request.user.Username !== request.params.username) {
             return response.status(400).send('Permission denied')
         }
         let hashedPassword = Users.hashPassword(request.body.password);
