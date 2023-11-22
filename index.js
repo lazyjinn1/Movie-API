@@ -223,7 +223,7 @@ app.put('/users/:username',
                 response.json(updatedUser)
             }).catch((error) => {
                 console.error(error);
-                response.status(500).send('Error ' + error)
+                response.status(500).send({'Error ': error, "errorResponse" : response} );
             })
     }
 );
