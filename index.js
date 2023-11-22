@@ -87,8 +87,8 @@ app.get('/movies', passport.authenticate('jwt', { session: false }),
 
 // Request: See specific movie details
 app.get('/movies/:title', passport.authenticate('jwt', { session: false }),
-     (request, response) => {
-         Movies.findOne({ Title: request.params.title })
+    (request, response) => {
+        Movies.findOne({ Title: request.params.title })
             // if a movie is found with the given title, said movie is returned.
             .then((movies) => {
                 response.status(200).json(movies);
@@ -102,8 +102,8 @@ app.get('/movies/:title', passport.authenticate('jwt', { session: false }),
 
 // Request: See movies by genre
 app.get('/movies/genres/:genre', passport.authenticate('jwt', { session: false }),
-     (request, response) => {
-         Movies.find({ 'Genre.Name': request.params.genre })
+    (request, response) => {
+        Movies.find({ 'Genre.Name': request.params.genre })
             // if movies are found with the given genre, said movies is returned.
             .then((movie) => {
                 response.json(movie);
@@ -117,8 +117,8 @@ app.get('/movies/genres/:genre', passport.authenticate('jwt', { session: false }
 
 // Request: See movies by director
 app.get('/movies/directors/:director', passport.authenticate('jwt', { session: false }),
-     (request, response) => {
-         Movies.find({ 'Director.Name': request.params.director })
+    (request, response) => {
+        Movies.find({ 'Director.Name': request.params.director })
             // if movies are found with the given director, said movies is returned.
             .then((movie) => {
                 response.json(movie);
@@ -131,46 +131,46 @@ app.get('/movies/directors/:director', passport.authenticate('jwt', { session: f
     })
 
 // Request: Registration
-app.post("/users",[
-    check('Username', 'Username is required').isLength({min: 5}),
+app.post("/users", [
+    check('Username', 'Username is required').isLength({ min: 5 }),
     check('Username', 'Username contains non alphanumric characters - not allowed.').isAlphanumeric(),
     check('Password', 'Password is required').not().isEmpty(),
     check('Email', 'Email does not appear to be vaild').isEmail()
-  ], async (request, response) => {
+], async (request, response) => {
     let errors = validationResult(request)
-    if(!errors.isEmpty()){
-      return response.status(422).json({errors: errors.array()})
+    if (!errors.isEmpty()) {
+        return response.status(422).json({ errors: errors.array() })
     }
-    let hashPassword = Users.hashPassword(request.body.password);
-    await Users.findOne({name: request.body.name})
-    .then((user) => {
-      if (user){
-        return response.status(400).send(request.body.name + ' already exists')
-      } else {
-        Users.create({
-          name: request.body.name,
-          password: hashPassword,
-          email: request.body.email,
-          birthday: request.body.birthday
-        }).then((user) => {
-            response.status(201).json(user)
-        }).catch((error) => {
-          console.error(error);
-          response.status(500).send('Error ' + error)
+    let hashedPassword = Users.hashPassword(request.body.password);
+    await Users.findOne({ Username: request.body.username })
+        .then((user) => {
+            if (user) {
+                return response.status(400).send(request.body.username + ' already exists')
+            } else {
+                Users.create({
+                    Username: request.body.username,
+                    Password: hashedPassword,
+                    Email: request.body.email,
+                    Birthday: request.body.birthday
+                }).then((user) => {
+                    response.status(201).json(user)
+                }).catch((error) => {
+                    console.error(error);
+                    response.status(500).send('Error ' + error)
+                })
+            }
         })
-      }
-    })
-    .catch((error) => {
-      console.error(error)
-      response.status(500).send('Error ' + error)
-    })
-  });
+        .catch((error) => {
+            console.error(error)
+            response.status(500).send('Error ' + error)
+        })
+});
 
 
 //Request: See all users
 app.get('/users', passport.authenticate('jwt', { session: false }),
-     (request, response) => {
-         Users.find()
+    (request, response) => {
+        Users.find()
             // if there are users to be found, this will bring you to all of them.
             .then((users) => {
                 response.status(201).json(users);
@@ -184,8 +184,8 @@ app.get('/users', passport.authenticate('jwt', { session: false }),
 
 // Request: See specific users
 app.get('/users/:username', passport.authenticate('jwt', { session: false }),
-     (request, response) => {
-         Users.findOne({ Username: request.params.username })
+    (request, response) => {
+        Users.findOne({ Username: request.params.username })
             // If this username exist in the database, this returns their info.
             .then((user) => {
                 response.json(user);
@@ -220,12 +220,12 @@ app.put('/users/:username',
                     Birthday: request.body.birthday
                 }
             },
-            { new: true }).then((updatedUser) => { 
+            { new: true }).then((updatedUser) => {
                 response.json(updatedUser)
             }).catch((error) => {
                 console.log(Users);
                 console.error(error);
-                response.status(500).send({'Error ': error, "errorResponse" : response} );
+                response.status(500).send({ 'Error ': error, "errorResponse": response });
             })
     }
 );
@@ -235,7 +235,7 @@ app.put('/users/:username',
 app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
     (request, response) => {
         // this looks to see if there are any people with this username AND deletes it.
-         Users.findOneAndRemove({ Username: request.params.username })
+        Users.findOneAndRemove({ Username: request.params.username })
             .then((user) => {
                 // if username is not found, then an error is sent.
                 if (!user) {
@@ -294,14 +294,14 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
     (request, response) => {
         try {
             // defines user as someone in the Users database with the username stated in :username
-            const user =  Users.findOne({ Username: request.params.username })
+            const user = Users.findOne({ Username: request.params.username })
             // if user does not exist then an error will occur.
             if (!user) {
                 return response.status(404).send('User not found.');
             }
 
             //defines movie as a movie with the movieID in :movieID
-            const movie =  Movies.findOne({ _id: request.params.movieID })
+            const movie = Movies.findOne({ _id: request.params.movieID })
 
             if (!movie) {
                 response.status(404).send(movie.Title + ' was not found in the database.');
@@ -310,12 +310,12 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
                 response.status(404).send(movie.Title + ' was not found in your Favorites.');
             } else {
                 // otherwise, this pulls the old movie id away and removes it from your Favorites List.
-                 Users.findOneAndUpdate({ Username: request.params.username }, {
+                Users.findOneAndUpdate({ Username: request.params.username }, {
                     $pull: { FavoriteMovies: request.params.movieID }
                 },
                     { new: true })
                 // saves the data.
-                 user.save();
+                user.save();
                 response.status(204).json(movie.Title + ' has been removed from Favorites.');
 
             }
