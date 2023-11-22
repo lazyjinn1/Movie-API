@@ -131,41 +131,40 @@ app.get('/movies/directors/:director', passport.authenticate('jwt', { session: f
     })
 
 // Request: Registration
-app.post('/users', 
-    [
-        check('Username', 'Username is too short').isLength({ min: 6 }),
-        check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
-        check('Password', 'Password cannot be empty').not().isEmpty(),
-        check('Email', 'Email is invalid').isEmail()
-    ],  (request, response) => {
-        try {
-            let errors = validationResult(request);
-            if (!errors.isEmpty()) {
-                return response.status(422).json({ errors: errors.array() });
-            }
-
-            let existingUser =  Users.findOne({ Username: request.body.username });
-            
-            if (existingUser) {
-                console.log(existingUser);
-                return response.status(400).send(request.body.username + ' already exists');
-            }
-
-            let hashedPassword =  Users.hashPassword(request.body.password);
-            Users.create({
-                Username: request.body.username,
-                Password: hashedPassword,
-                Email: request.body.email,
-                Birthday: request.body.birthday
-            });
-
-            response.status(201).send(request.body.username + ' has been successfully registered!');
-        } catch (error) {
-            console.error(error);
-            response.status(500).send('Error: ' + error.message);
-        }
+app.post("/users",[
+    check('Username', 'Username is required').isLength({min: 5}),
+    check('Username', 'Username contains non alphanumric characters - not allowed.').isAlphanumeric(),
+    check('Password', 'Password is required').not().isEmpty(),
+    check('Email', 'Email does not appear to be vaild').isEmail()
+  ], async (request, response) => {
+    let errors = validationResult(request)
+    if(!errors.isEmpty()){
+      return response.status(422).json({errors: errors.array()})
     }
-);
+    let hashPassword = Users.hashPassword(request.body.password);
+    await Users.findOne({name: request.body.name})
+    .then((user) => {
+      if (user){
+        return response.status(400).send(request.body.name + ' already exists')
+      } else {
+        Users.create({
+          name: request.body.name,
+          password: hashPassword,
+          email: request.body.email,
+          birthday: request.body.birthday
+        }).then((user) => {
+            response.status(201).json(user)
+        }).catch((error) => {
+          console.error(error);
+          response.status(500).send('Error ' + error)
+        })
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+      response.status(500).send('Error ' + error)
+    })
+  });
 
 
 //Request: See all users
