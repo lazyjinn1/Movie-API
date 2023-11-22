@@ -219,7 +219,7 @@ app.put('/users/:username',
                     Birthday: request.body.birthday
                 }
             },
-            { new: true }).then((updatedUser) => {
+            { new: true }).then((updatedUser) => { 
                 response.json(updatedUser)
             }).catch((error) => {
                 console.error(error);
