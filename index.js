@@ -144,20 +144,20 @@ app.post('/users',
                 return response.status(422).json({ errors: errors.array() });
             }
 
-            const existingUser =  Users.findOne({ Username: request.body.username });
+            const existingUser =  Users.findOne({ Username: request.body.Username });
             if (existingUser) {
-                return response.status(400).send(request.body.username + ' already exists', request.body.fullErrorLogs + errors);
+                return response.status(400).send(request.body.Username + ' already exists');
             }
 
-            const hashedPassword =  Users.hashPassword(request.body.password);
+            const hashedPassword =  Users.hashPassword(request.body.Password);
             Users.create({
-                Username: request.body.username,
+                Username: request.body.Username,
                 Password: hashedPassword,
-                Email: request.body.email,
-                Birthday: request.body.birthday
+                Email: request.body.Email,
+                Birthday: request.body.Birthday
             });
 
-            response.status(201).send(request.body.username + ' has been successfully registered!');
+            response.status(201).send(request.body.Username + ' has been successfully registered!');
         } catch (error) {
             console.error(error);
             response.status(500).send('Error: ' + error.message);
@@ -208,15 +208,15 @@ app.put('/users/:username',
         if (request.user.Username !== request.params.username) {
             return response.status(400).send('Permission denied')
         }
-        let hashedPassword = Users.hashPassword(request.body.password);
+        let hashedPassword = Users.hashPassword(request.body.Password);
         Users.findOneAndUpdate(
             { Username: request.params.username },
             {
                 $set: {
-                    Username: request.body.username,
+                    Username: request.body.Username,
                     Password: hashedPassword,
-                    Email: request.body.email,
-                    Birthday: request.body.birthday
+                    Email: request.body.Email,
+                    Birthday: request.body.Birthday
                 }
             },
             { new: true }).then((updatedUser) => { 
