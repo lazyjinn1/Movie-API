@@ -29,20 +29,25 @@ const Movies = Models.Movie;
 
 // defines a USers variable that relates to each user in the Models' User Schema.
 const Users = Models.User;
+const testPort = 27017;
 
 // connects our server to the MongoDB Database LOCALLY
-// mongoose.connect('http://localhost:12017', {
+var mongodb_conn = mongoose.connect(`mongodb://127.0.0.1:${testPort}/`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+
+
+
+// //connects our server to the MongoDB Database ON ATLAS
+// mongoose.connect(process.env.CONNECTION_URI, {
 //     useNewUrlParser: true,
 //     useUnifiedTopology: true
 // });
 
-//connects our server to the MongoDB Database ON ATLAS
-mongoose.connect(process.env.CONNECTION_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
 // list of origins that are allowed by CORS
-let allowedOrigins = ['http://localhost:1234', 'http://testsite.com', 'http://localhost:8080', 'https://jeriflix.onrender.com'];
+let allowedOrigins = ['http://localhost:1234', 'http://testsite.com', 'http://localhost:8080', 'https://jeriflix.onrender.com', 'mongodb://127.0.0.1:8080'];
 
 // launches CORS
 app.use(cors({
@@ -66,6 +71,11 @@ app.use(express.static('public'));
 // default page with no path brings you to documentation
 app.get('/', (request, response) => {
     response.sendFile('public/documentation.html', { root: __dirname });
+});
+
+app.get('/testApi', (request, response) => {
+
+    response.status(200).send(mongodb_conn);
 });
 
 // if user loads into /movies, this returns the movies in JSON
@@ -206,7 +216,7 @@ app.put('/users/:username',
     passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         try {
-            const errors = validationResult(request);
+            const errors = validationResult(request.body);
             if (!errors.isEmpty()) {
                 return response.status(422).json({ errors: errors.array() });
             }
@@ -214,7 +224,7 @@ app.put('/users/:username',
             if (request.user.Username !== request.params.username) {
                 return response.status(401).send('Permission denied');
             }
-
+        
             // Check if the request body includes a new password.
             if (request.body.Password) {
                 // If a new password is provided, hash it.
@@ -231,6 +241,8 @@ app.put('/users/:username',
                 response.json(updatedUser);
             }
 
+            console.log("USERANME",request.body);
+
             // Check if the request body has something else.
             const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
                 $set: {
@@ -239,8 +251,9 @@ app.put('/users/:username',
                     Birthday: request.body.Birthday
                 }
             },
-
                 { new: true });
+
+                
 
             response.json(updatedUser);
         } catch (error) {
