@@ -32,19 +32,19 @@ const Users = Models.User;
 const testPort = 27017;
 
 // connects our server to the MongoDB Database LOCALLY
-var mongodb_conn = mongoose.connect(`mongodb://127.0.0.1:${testPort}/`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
-
-
-
-
-// //connects our server to the MongoDB Database ON ATLAS
-// mongoose.connect(process.env.CONNECTION_URI, {
+// var mongodb_conn = mongoose.connect(`mongodb://127.0.0.1:${testPort}/`, {
 //     useNewUrlParser: true,
 //     useUnifiedTopology: true
 // });
+
+
+
+
+//connects our server to the MongoDB Database ON ATLAS
+mongoose.connect(process.env.CONNECTION_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 
 // list of origins that are allowed by CORS
 let allowedOrigins = ['http://localhost:1234', 'http://testsite.com', 'http://localhost:8080', 'https://jeriflix.onrender.com', 'mongodb://127.0.0.1:8080'];
