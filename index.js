@@ -221,7 +221,7 @@ app.put('/users/:username',
             if (request.user.Username !== request.params.username) {
                 return response.status(401).send('Permission denied');
             }
-        
+
             // Check if the request body includes a new password.
             if (request.body.Password) {
                 // If a new password is provided, hash it.
@@ -234,25 +234,23 @@ app.put('/users/:username',
                     }
                 },
                     { new: true });
-
                 response.json(updatedUser);
             }
 
-            console.log("USERANME",request.body);
-
-            // Check if the request body has something else.
-            const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
-                $set: {
-                    Username: request.body.Username,
-                    Email: request.body.Email,
-                    Birthday: request.body.Birthday
-                }
-            },
+            else {
+                // Check if the request body has something else.
+                const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
+                    $set: {
+                        Username: request.body.Username,
+                        Email: request.body.Email,
+                        Birthday: request.body.Birthday
+                    }
+                },
                 { new: true });
+                response.json(updatedUser);
+            }
 
-                
 
-            response.json(updatedUser);
         } catch (error) {
             console.error(error);
             response.status(500).send('Error: ' + error.message);
