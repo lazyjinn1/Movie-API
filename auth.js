@@ -25,7 +25,7 @@ module.exports = (router) => {
             // if there is an error or user is not found, this is what is sent:
             if (error || !user) {
                 return response.status(400).json({
-                    message: 'Something is not rigasdasdht.',
+                    message: 'Something is not right.',
                     user: user,
                     info: info
                 });

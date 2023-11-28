@@ -37,9 +37,6 @@ const testPort = 27017;
 //     useUnifiedTopology: true
 // });
 
-
-
-
 //connects our server to the MongoDB Database ON ATLAS
 mongoose.connect(process.env.CONNECTION_URI, {
     useNewUrlParser: true,
