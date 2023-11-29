@@ -4,6 +4,7 @@ const express = require("express"),
     bodyParser = require("body-parser"),
     path = require("path"),
     cors = require("cors");
+    const multer = require('multer');
 // defining a variable app as express's many functions
 const app = express();
 
@@ -74,6 +75,18 @@ app.get('/testApi', (request, response) => {
 
     response.status(200).send(mongodb_conn);
 });
+
+// Set up Multer storage
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Specify the directory where uploaded files will be stored
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname); // Define the filename
+    },
+});
+
+const upload = multer({ storage: storage });
 
 // if user loads into /movies, this returns the movies in JSON
 // Request: See all movies
