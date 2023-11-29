@@ -354,26 +354,6 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
 
     });
 
-    app.put('/users/:username', upload.single('profilePic'), (req, res) => {
-        const username = req.params.username;
-        const { Email, Birthday } = req.body;
-    
-        // Check if a file was uploaded
-        if (req.file) {
-            const profilePicPath = req.file.path;
-    
-            // Save the file path to the user model
-            Users.findOneAndUpdate({ Username: username }, { Email, Birthday, ProfilePic: profilePicPath }, { new: true })
-                .then((user) => res.status(200).json(user))
-                .catch((error) => res.status(500).send(error.message));
-        } else {
-            // No file uploaded, update only non-file fields
-            Users.findOneAndUpdate({ Username: username }, { Email, Birthday }, { new: true })
-                .then((user) => res.status(200).json(user))
-                .catch((error) => res.status(500).send(error.message));
-        }
-    });
-
 // error logger just in case something wrong happens
 app.use((error, request, response, next) => {
     console.error(error.stack);
