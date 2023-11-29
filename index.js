@@ -162,7 +162,6 @@ app.post('/users',
                 Password: hashedPassword,
                 Email: request.body.Email,
                 Birthday: request.body.Birthday,
-                profilePic: 'default'
             });
 
             response.status(201).send(request.body.Username + ' has been successfully registered!');
