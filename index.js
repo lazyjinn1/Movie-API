@@ -252,7 +252,8 @@ app.put('/users/:username',
                     $set: {
                         Username: request.body.Username,
                         Email: request.body.Email,
-                        Birthday: request.body.Birthday
+                        Birthday: request.body.Birthday,
+                        profilePic: request.body.profilePic
                     }
                 },
                 { new: true });
