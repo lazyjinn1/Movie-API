@@ -22,6 +22,7 @@ let movieSchema = mongoose.Schema({
 
 // this is the schema (schematics) for our users
 let userSchema = mongoose.Schema({
+    profilePic: {type: String},
     Username: {type: String, required: true},
     Password: {type: String, required: true},
     Email: {type: String},
