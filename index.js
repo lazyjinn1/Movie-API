@@ -372,7 +372,7 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
             const profilePicPath = req.file.path;
     
             // Save the file path to the user model
-            Users.findOneAndUpdate({ Username: username }, { Email, Birthday, ProfilePic: profilePicPath }, { new: true })
+            Users.findOneAndUpdate({ Username: username }, { Email, Birthday, profilePic: profilePicPath }, { new: true })
                 .then((user) => res.status(200).json(user))
                 .catch((error) => res.status(500).send(error.message));
         } else {
