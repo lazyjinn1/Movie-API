@@ -24,16 +24,16 @@ require('./passport');
 
 // If you want to connect locally:
 const port = 8080;
+const localPort = 27017
 
 // defines a Movies variable that relates to each movie in the Models' Movie Schema.
 const Movies = Models.Movie;
 
 // defines a USers variable that relates to each user in the Models' User Schema.
 const Users = Models.User;
-const testPort = 27017;
 
 // connects our server to the MongoDB Database LOCALLY
-// var mongodb_conn = mongoose.connect(`mongodb://127.0.0.1:${testPort}/`, {
+// var mongodb_conn = mongoose.connect(`mongodb://127.0.0.1:${localPort}/`, {
 //     useNewUrlParser: true,
 //     useUnifiedTopology: true
 // });
@@ -69,11 +69,6 @@ app.use(express.static('public'));
 // default page with no path brings you to documentation
 app.get('/', (request, response) => {
     response.sendFile('public/documentation.html', { root: __dirname });
-});
-
-app.get('/testApi', (request, response) => {
-
-    response.status(200).send(mongodb_conn);
 });
 
 // Set up Multer storage
@@ -175,7 +170,7 @@ app.post('/users',
                 Password: hashedPassword,
                 Email: request.body.Email,
                 Birthday: request.body.Birthday,
-                profilePic: 'default'
+                profilePic: request.body.profilePic
             });
 
             response.status(201).send(request.body.Username + ' has been successfully registered!');
