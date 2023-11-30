@@ -171,7 +171,7 @@ app.post('/users',
     upload.single('profilePicture'), 
     async (request, response) => {
         try {
-            const profilePicture = request.file ? request.file : null;
+            const profilePicture = request.file ? request.file.path : null;
 
             if (profilePicture && !fileFilter(null, profilePicture, () => {})) {
                 return response.status(422).json({ error: 'Invalid file type.' });
@@ -275,7 +275,7 @@ app.put('/users/:username',
                 response.json(updatedUser);
             } else {
                 // Handle profilePic upload
-                const profilePicture = request.file ? request.file : null;
+                const profilePicture = request.file ? request.file.path : null;
 
                 // Check if the request body has something else.
                 const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
