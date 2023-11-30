@@ -187,6 +187,7 @@ app.post('/users',
                 Birthday: request.body.Birthday,
                 profilePic: profilePicPath
             });
+            console.log(profilePic);
 
             response.status(201).send(request.body.Username + ' has been successfully registered!');
         } catch (error) {
