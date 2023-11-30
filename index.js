@@ -163,10 +163,10 @@ app.post('/users',
         check('Password', 'Password cannot be empty').not().isEmpty(),
         check('Email', 'Email is invalid').isEmail()
     ], 
-    upload.single('profilePic'), 
+    upload.single('profilePicture'), 
     async (request, response) => {
         try {
-            const profilePicPath = request.file ? request.file.path : null;
+            const profilePicturePath = request.file ? request.file.path : null;
             const hashedPassword = await Users.hashPassword(request.body.Password);
             const errors = validationResult(request);
 
@@ -184,9 +184,9 @@ app.post('/users',
                 Password: hashedPassword,
                 Email: request.body.Email,
                 Birthday: request.body.Birthday,
-                profilePic: profilePicPath
+                profilePicture: profilePicturePath
             });
-            console.log(profilePic);
+            console.log(profilePicturePath);
 
             response.status(201).send(request.body.Username + ' has been successfully registered!');
         } catch (error) {
@@ -229,61 +229,7 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }),
     }
 );
 
-// // Request: Change Account Information
-// app.put('/users/:username',
-//     [check('Username', 'Username is too short').isLength({ min: 5 }).optional({ checkFalsy: true }),
-//     check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric().optional({ checkFalsy: true }),
-//     check('Email', 'Email is invalid').isEmail().optional({ checkFalsy: true }),
-//     check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
-//     ],
-//     passport.authenticate('jwt', { session: false }),
-//     async (request, response) => {
-//         try {
-//             const errors = validationResult(request.body);
-//             if (!errors.isEmpty()) {
-//                 return response.status(422).json({ errors: errors.array() });
-//             }
-
-//             if (request.user.Username !== request.params.username) {
-//                 return response.status(401).send('Permission denied');
-//             }
-
-//             // Check if the request body includes a new password.
-//             if (request.body.Password) {
-//                 // If a new password is provided, hash it.
-//                 const hashedPassword = await Users.hashPassword(request.body.Password);
-
-//                 // Update the user's password with the new hashed password.
-//                 const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
-//                     $set: {
-//                         Password: hashedPassword,
-//                     }
-//                 },
-//                     { new: true });
-//                 response.json(updatedUser);
-//             }
-
-//             else {
-//                 // Check if the request body has something else.
-//                 const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
-//                     $set: {
-//                         Username: request.body.Username,
-//                         Email: request.body.Email,
-//                         Birthday: request.body.Birthday,
-//                         profilePic: request.body.profilePic
-//                     }
-//                 },
-//                     { new: true });
-//                 response.json(updatedUser);
-//             }
-
-
-//         } catch (error) {
-//             console.error(error);
-//             response.status(500).send('Error: ' + error.message);
-//         }
-//     }
-// );
+// Request: Change Account Information
 app.put('/users/:username',
     [
         check('Username', 'Username is too short').isLength({ min: 5 }).optional({ checkFalsy: true }),
@@ -292,7 +238,7 @@ app.put('/users/:username',
         check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
     ],
     passport.authenticate('jwt', { session: false }),
-    upload.single('profilePic'), // Handle file upload
+    upload.single('profilePicture'), // Handle file upload
     async (request, response) => {
         try {
             const errors = validationResult(request.body);
@@ -319,7 +265,7 @@ app.put('/users/:username',
                 response.json(updatedUser);
             } else {
                 // Handle profilePic upload
-                const profilePicPath = request.file ? request.file.path : null;
+                const profilePicturePath = request.file ? request.file.path : null;
 
                 // Check if the request body has something else.
                 const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
@@ -327,7 +273,7 @@ app.put('/users/:username',
                         Username: request.body.Username,
                         Email: request.body.Email,
                         Birthday: request.body.Birthday,
-                        profilePic: profilePicPath,
+                        profilePicture: profilePicturePath,
                     }
                 },
                     { new: true });
@@ -438,36 +384,6 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
 
     }
 );
-
-// app.put('/users/:username', upload.single('profilePic'), passport.authenticate('jwt', { session: false }),
-//     async (request, response) => {
-//         try {
-//             const username = request.params.username;
-//             const { Email, Birthday } = request.body;
-
-//             // Check if a file was uploaded
-//             if (request.file) {
-//                 const profilePicPath = request.file.path;
-
-//                 // Save the file path to the user model
-//                 const updatedUser = await Users.findOneAndUpdate({ Username: username },
-//                     { Email, Birthday, profilePic: profilePicPath }, { new: true });
-
-//                 response.status(200).json(updatedUser);
-//             } else {
-//                 // No file uploaded, update only non-file fields
-//                 const updatedUser = await Users.findOneAndUpdate({ Username: username },
-//                     { Email, Birthday }, { new: true });
-
-//                 response.status(200).json(updatedUser);
-//             }
-
-//         } catch (error) {
-//             console.error(error);
-//             response.status(500).send('Error: ' + error.message);
-//         }
-//     });
-
 
 // error logger just in case something wrong happens
 app.use((error, request, response, next) => {
