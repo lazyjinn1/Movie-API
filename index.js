@@ -22,18 +22,16 @@ let auth = require('./auth.js')(app);
 const passport = require('passport');
 require('./passport');
 
-// If you want to connect locally:
-const port = 8080;
-const localPort = 27017
-
-// defines a Movies variable that relates to each movie in the Models' Movie Schema.
+// defines a Movies and Users variables that relates to each movie/user in the Models' Movie/User Schema.
 const Movies = Models.Movie;
-
-// defines a USers variable that relates to each user in the Models' User Schema.
 const Users = Models.User;
 
+// If you want to connect locally:
+const port = 8080;
+const testPort = 27017;
+
 // connects our server to the MongoDB Database LOCALLY
-// var mongodb_conn = mongoose.connect(`mongodb://127.0.0.1:${localPort}/`, {
+// mongoose.connect(`mongodb://localhost:${testPort}/`, {
 //     useNewUrlParser: true,
 //     useUnifiedTopology: true
 // });
