@@ -26,41 +26,6 @@ require('./passport');
 const Movies = Models.Movie;
 const Users = Models.User;
 
-// If you want to connect locally:
-const port = 8080;
-const testPort = 27017;
-
-// connects our server to the MongoDB Database LOCALLY
-// mongoose.connect(`mongodb://localhost:${testPort}/`, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// });
-
-//connects our server to the MongoDB Database ON ATLAS
-mongoose.connect(process.env.CONNECTION_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
-
-// list of origins that are allowed by CORS
-let allowedOrigins = ['http://localhost:1234', 'http://testsite.com', 'http://localhost:8080', 'https://jeriflix.onrender.com', 'mongodb://127.0.0.1:8080'];
-
-// launches CORS
-app.use(cors({
-    // this looks for what the origin is and the appropriate response
-    origin: (origin, callback) => {
-        // if there is NO origin, then it goes through
-        if (!origin) return callback(null, true);
-        // if the origin exists but does NOT match an origin in the allowedOrigins array, then this error happens
-        if (allowedOrigins.indexOf(origin) === -1) {
-            let message = 'The CORS policy for this application doesn\'t allow access from origin ' + origin;
-            return callback(new Error(message), false);
-        }
-        // if it does match an origin in the allowedOrigins array, then it goes through.
-        return callback(null, true);
-    }
-}));
-
 // activates the ability to use public folders using express
 app.use(express.static('public'));
 app.use(express.static('uploads'));
@@ -85,6 +50,45 @@ const fileFilter = (request, file, cb) => {
 };
 
 const upload = multer({ storage: storage, fileFilter });
+
+
+
+// If you want to connect locally:
+const port = 8080;
+const testPort = 27017;
+
+// connects our server to the MongoDB Database LOCALLY
+// mongoose.connect(`mongodb://localhost:${testPort}/`, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// });
+
+//connects our server to the MongoDB Database ON ATLAS
+mongoose.connect(process.env.CONNECTION_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+
+
+// list of origins that are allowed by CORS
+let allowedOrigins = ['http://localhost:1234', 'http://testsite.com', 'http://localhost:8080', 'https://jeriflix.onrender.com', 'mongodb://127.0.0.1:8080'];
+
+// launches CORS
+app.use(cors({
+    // this looks for what the origin is and the appropriate response
+    origin: (origin, callback) => {
+        // if there is NO origin, then it goes through
+        if (!origin) return callback(null, true);
+        // if the origin exists but does NOT match an origin in the allowedOrigins array, then this error happens
+        if (allowedOrigins.indexOf(origin) === -1) {
+            let message = 'The CORS policy for this application doesn\'t allow access from origin ' + origin;
+            return callback(new Error(message), false);
+        }
+        // if it does match an origin in the allowedOrigins array, then it goes through.
+        return callback(null, true);
+    }
+}));
 
 
 // default page with no path brings you to documentation
@@ -266,7 +270,7 @@ app.put('/users/:username',
                 response.json(updatedUser);
             } else {
                 // Handle profilePic upload
-                const profilePicturePath = request.file ? request.file.path : null;
+                const profilePicture = request.file ? request.file : null;
 
                 // Check if the request body has something else.
                 const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
@@ -274,7 +278,7 @@ app.put('/users/:username',
                         Username: request.body.Username,
                         Email: request.body.Email,
                         Birthday: request.body.Birthday,
-                        profilePicture: profilePicturePath,
+                        ProfilePicture: profilePicture,
                     }
                 },
                 { new: true });
