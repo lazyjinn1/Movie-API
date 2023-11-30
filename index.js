@@ -68,10 +68,10 @@ app.use(express.static('uploads'));
 // Set up Multer storage
 const storage = multer.diskStorage({
     destination: function (request, file, cb) {
-        cb(null, 'uploads'); // Specify the directory where uploaded files will be stored
+        cb(null, 'uploads'); // directory where uploads will be stored
     },
     filename: function (request, file, cb) {
-        cb(null, file.originalname); // Define the filename
+        cb(null, file.originalname);// file name
     },
 });
 
@@ -155,7 +155,10 @@ app.get('/movies/directors/:director', passport.authenticate('jwt', { session: f
             })
     })
 
+
 // Request: Registration
+const pfpUpload = upload.fields([{ name: 'profilePicture', maxCount: 1 }])
+
 app.post('/users',
     [
         check('Username', 'Username is too short').isLength({ min: 5 }),
@@ -164,9 +167,10 @@ app.post('/users',
         check('Email', 'Email is invalid').isEmail()
     ], 
     upload.single('profilePicture'), 
+    pfpUpload,
     async (request, response) => {
         try {
-            const profilePicturePath = request.file ? request.file.path : null;
+            const profilePicturePath = request.files['profilePicture'[0]] ? request.file.path : null;
             const hashedPassword = await Users.hashPassword(request.body.Password);
             const errors = validationResult(request);
 
@@ -276,7 +280,7 @@ app.put('/users/:username',
                         profilePicture: profilePicturePath,
                     }
                 },
-                    { new: true });
+                { new: true });
                 response.json(updatedUser);
             }
         } catch (error) {
