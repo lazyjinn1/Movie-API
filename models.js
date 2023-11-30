@@ -27,7 +27,10 @@ let userSchema = mongoose.Schema({
     Email: { type: String },
     Birthday: { type: Date },
     FavoriteMovies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
-    ProfilePicture: { type: String }
+    ProfilePicture: {
+        name: String,
+        type: String,
+    },
 })
 
 // this hashes the password that is inputted for the userSchema. Hashing means that it gets 
