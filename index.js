@@ -65,6 +65,7 @@ app.use(cors({
 
 // activates the ability to use public folders using express
 app.use(express.static('public'));
+app.use(express.static('uploads'));
 
 // default page with no path brings you to documentation
 app.get('/', (request, response) => {
@@ -365,6 +366,7 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
     });
 
     app.put('/users/:username', upload.single('profilePic'), (req, res) => {
+        console.log(req.file);
         const username = req.params.username;
         const { Email, Birthday } = req.body;
     
