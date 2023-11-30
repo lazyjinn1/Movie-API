@@ -157,8 +157,6 @@ app.get('/movies/directors/:director', passport.authenticate('jwt', { session: f
 
 
 // Request: Registration
-const pfpUpload = upload.fields([{ name: 'profilePicture', maxCount: 1 }])
-
 app.post('/users',
     [
         check('Username', 'Username is too short').isLength({ min: 5 }),
@@ -167,10 +165,9 @@ app.post('/users',
         check('Email', 'Email is invalid').isEmail()
     ], 
     upload.single('profilePicture'), 
-    pfpUpload,
     async (request, response) => {
         try {
-            const profilePicturePath = request.files['profilePicture'[0]] ? request.file.path : null;
+            const profilePicturePath = request.file ? request.file.path : null;
             const hashedPassword = await Users.hashPassword(request.body.Password);
             const errors = validationResult(request);
 
@@ -188,7 +185,7 @@ app.post('/users',
                 Password: hashedPassword,
                 Email: request.body.Email,
                 Birthday: request.body.Birthday,
-                profilePicture: profilePicturePath
+                ProfilePicture: profilePicturePath
             });
             console.log(profilePicturePath);
 
