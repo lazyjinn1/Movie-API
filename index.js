@@ -248,7 +248,7 @@ app.put('/users/:username',
         check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
     ],
     passport.authenticate('jwt', { session: false }),
-    upload.single('ProfilePicture'), // Handle file upload
+    upload.single('profilePicture'), // Handle file upload
     async (request, response) => {
         try {
             const errors = validationResult(request.body);
