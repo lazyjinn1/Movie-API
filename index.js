@@ -42,7 +42,7 @@ const storage = multer.diskStorage({
 
 const fileFilter = (request, file, cb) => {
     const allowedfileTypes = ["image/jpeg", "image/jpg", "image/png"];
-    if (allowedfileTypes.includes(file.mimetype)) {
+    if (allowedfileTypes.includes(file.type)) {
         cb(null, true);
     } else {
         cb(null, false);
@@ -176,7 +176,7 @@ app.post('/users',
             if (profilePicture && !fileFilter(null, profilePicture, () => {})) {
                 return response.status(422).json({ error: 'Invalid file type.' });
             }
-            
+
             const hashedPassword = await Users.hashPassword(request.body.Password);
             const errors = validationResult(request);
 
