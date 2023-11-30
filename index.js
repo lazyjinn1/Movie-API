@@ -2,9 +2,10 @@ const express = require("express"),
     mongoose = require("mongoose"),
     Models = require("./models.js"),
     bodyParser = require("body-parser"),
+    multer = require('multer');
     path = require("path"),
     cors = require("cors");
-const multer = require('multer');
+    
 // defining a variable app as express's many functions
 const app = express();
 
