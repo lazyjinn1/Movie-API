@@ -67,22 +67,33 @@ app.use(cors({
 app.use(express.static('public'));
 app.use(express.static('uploads'));
 
+// Set up Multer storage
+const storage = multer.diskStorage({
+    destination: function (request, file, cb) {
+        cb(null, 'uploads/'); // Specify the directory where uploaded files will be stored
+    },
+    filename: function (request, file, cb) {
+        cb(null, file.originalname); // Define the filename
+    },
+});
+
+const fileFilter = (request, file, cb) => {
+    const allowedfileTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (allowedfileTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+};
+
+const upload = multer({ storage: storage, fileFilter });
+
+
 // default page with no path brings you to documentation
 app.get('/', (request, response) => {
     response.sendFile('public/documentation.html', { root: __dirname });
 });
 
-// Set up Multer storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/'); // Specify the directory where uploaded files will be stored
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname); // Define the filename
-    },
-});
-
-const upload = multer({ storage: storage });
 
 // if user loads into /movies, this returns the movies in JSON
 // Request: See all movies
