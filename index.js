@@ -67,7 +67,7 @@ app.use(express.static('public'));
 // Set up Multer storage
 const storage = multer.diskStorage({
     destination: function (request, file, cb) {
-        cb(null, 'public/uploads/Profile-Pictures'); // Specify the directory where uploaded files will be stored
+        cb(null, 'uploads'); // Specify the directory where uploaded files will be stored
     },
     filename: function (request, file, cb) {
         cb(null, file.originalname); // Define the filename
