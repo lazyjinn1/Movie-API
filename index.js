@@ -172,6 +172,11 @@ app.post('/users',
     async (request, response) => {
         try {
             const profilePicture = request.file ? request.file : null;
+
+            if (profilePicture && !fileFilter(null, profilePicture, () => {})) {
+                return response.status(422).json({ error: 'Invalid file type.' });
+            }
+            
             const hashedPassword = await Users.hashPassword(request.body.Password);
             const errors = validationResult(request);
 
