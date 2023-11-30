@@ -167,7 +167,7 @@ app.post('/users',
     upload.single('profilePicture'), 
     async (request, response) => {
         try {
-            const profilePicturePath = request.file ? request.file.path : null;
+            const profilePicture = request.file ? request.file : null;
             const hashedPassword = await Users.hashPassword(request.body.Password);
             const errors = validationResult(request);
 
@@ -185,9 +185,9 @@ app.post('/users',
                 Password: hashedPassword,
                 Email: request.body.Email,
                 Birthday: request.body.Birthday,
-                ProfilePicture: profilePicturePath
+                ProfilePicture: profilePicture
             });
-            console.log(profilePicturePath);
+            console.log(profilePicture);
 
             response.status(201).send(request.body.Username + ' has been successfully registered!');
         } catch (error) {
