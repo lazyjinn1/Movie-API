@@ -164,9 +164,14 @@ app.post('/users',
         check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric(),
         check('Password', 'Password cannot be empty').not().isEmpty(),
         check('Email', 'Email is invalid').isEmail()
-    ], async (request, response) => {
+    ], 
+    upload.single('profilePic'), 
+    async (request, response) => {
         try {
+            const profilePicPath = request.file ? request.file.path : null;
+            const hashedPassword = await Users.hashPassword(request.body.Password);
             const errors = validationResult(request);
+            
             if (!errors.isEmpty()) {
                 return response.status(422).json({ errors: errors.array() });
             }
@@ -175,14 +180,13 @@ app.post('/users',
             if (existingUser) {
                 return response.status(400).send(request.body.Username + ' already exists');
             }
-
-            const hashedPassword = await Users.hashPassword(request.body.Password);
+            
             await Users.create({
                 Username: request.body.Username,
                 Password: hashedPassword,
                 Email: request.body.Email,
                 Birthday: request.body.Birthday,
-                profilePic: request.body.profilePic
+                profilePic: profilePicPath
             });
 
             response.status(201).send(request.body.Username + ' has been successfully registered!');
