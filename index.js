@@ -171,9 +171,9 @@ app.post('/users',
     upload.single('profilePicture'), 
     async (request, response) => {
         try {
-            const profilePicture = request.file ? request.file.path : null;
+            const profilePicturePath = request.file ? request.file.path : null;
 
-            if (profilePicture && !fileFilter(null, profilePicture, () => {})) {
+            if (profilePicturePath && !fileFilter(null, profilePicturePath, () => {})) {
                 return response.status(422).json({ error: 'Invalid file type.' });
             }
 
@@ -194,9 +194,9 @@ app.post('/users',
                 Password: hashedPassword,
                 Email: request.body.Email,
                 Birthday: request.body.Birthday,
-                ProfilePicture: profilePicture
+                ProfilePicture: profilePicturePath
             });
-            console.log(profilePicture);
+            console.log(profilePicturePath);
 
             response.status(201).send(request.body.Username + ' has been successfully registered!');
         } catch (error) {
@@ -275,7 +275,7 @@ app.put('/users/:username',
                 response.json(updatedUser);
             } else {
                 // Handle profilePic upload
-                const profilePicture = request.file ? request.file.path : null;
+                const profilePicturePath = request.file ? request.file.path : null;
 
                 // Check if the request body has something else.
                 const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
@@ -283,7 +283,7 @@ app.put('/users/:username',
                         Username: request.body.Username,
                         Email: request.body.Email,
                         Birthday: request.body.Birthday,
-                        ProfilePicture: profilePicture,
+                        ProfilePicture: profilePicturePath,
                     }
                 },
                 { new: true });
