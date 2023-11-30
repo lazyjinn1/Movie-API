@@ -68,7 +68,7 @@ app.use(express.static('uploads'));
 // Set up Multer storage
 const storage = multer.diskStorage({
     destination: function (request, file, cb) {
-        cb(null, 'uploads'); // directory where uploads will be stored
+        cb(null, 'public'); // directory where uploads will be stored
     },
     filename: function (request, file, cb) {
         cb(null, file.originalname);// file name
@@ -239,7 +239,7 @@ app.put('/users/:username',
         check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
     ],
     passport.authenticate('jwt', { session: false }),
-    upload.single('profilePicture'), // Handle file upload
+    upload.single('ProfilePicture'), // Handle file upload
     async (request, response) => {
         try {
             const errors = validationResult(request.body);
