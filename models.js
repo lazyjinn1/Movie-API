@@ -22,12 +22,12 @@ let movieSchema = mongoose.Schema({
 
 // this is the schema (schematics) for our users
 let userSchema = mongoose.Schema({
-    profilePic: {type: String},
     Username: {type: String, required: true},
     Password: {type: String, required: true},
     Email: {type: String},
     Birthday: {type: Date},
-    FavoriteMovies: [{type: mongoose.Schema.Types.ObjectId, ref: 'Movie'}]
+    FavoriteMovies: [{type: mongoose.Schema.Types.ObjectId, ref: 'Movie'}],
+    profilePic: {type: String},
 })
 
 // this hashes the password that is inputted for the userSchema. Hashing means that it gets 

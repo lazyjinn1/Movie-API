@@ -4,7 +4,7 @@ const express = require("express"),
     bodyParser = require("body-parser"),
     path = require("path"),
     cors = require("cors");
-    const multer = require('multer');
+const multer = require('multer');
 // defining a variable app as express's many functions
 const app = express();
 
@@ -196,7 +196,8 @@ app.get('/users', passport.authenticate('jwt', { session: false }),
                 console.error(error);
                 response.status(404).send('Error: ' + error.message);
             });
-    });
+    }
+);
 
 // Request: See specific users
 app.get('/users/:username', passport.authenticate('jwt', { session: false }),
@@ -211,7 +212,8 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }),
                 console.error(error);
                 response.status(404).send('Error: ' + error.message);
             });
-    });
+    }
+);
 
 // Request: Change Account Information
 app.put('/users/:username',
@@ -257,7 +259,7 @@ app.put('/users/:username',
                         profilePic: request.body.profilePic
                     }
                 },
-                { new: true });
+                    { new: true });
                 response.json(updatedUser);
             }
 
@@ -266,8 +268,8 @@ app.put('/users/:username',
             console.error(error);
             response.status(500).send('Error: ' + error.message);
         }
-    });
-
+    }
+);
 
 // Request: Delete specific users
 app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
@@ -287,7 +289,8 @@ app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
                 console.error(error);
                 response.status(500).send('Error: ' + error.message);
             });
-    });
+    }
+);
 
 // Request: Add movie to favorites
 app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { session: false }),
@@ -325,7 +328,8 @@ app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { se
             response.status(500).send('Error: ' + error.message);
         }
 
-    });
+    }
+);
 
 // Request: Remove movie from favorites
 app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', { session: false }),
@@ -363,28 +367,38 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
             response.status(500).send('Error: ' + error.message);
         }
 
-    });
+    }
+);
 
-    app.put('/users/:username', upload.single('profilePic'), (req, res) => {
-        console.log(req.file);
-        const username = req.params.username;
-        const { Email, Birthday } = req.body;
-    
-        // Check if a file was uploaded
-        if (req.file) {
-            const profilePicPath = req.file.path;
-    
-            // Save the file path to the user model
-            Users.findOneAndUpdate({ Username: username }, { Email, Birthday, profilePic: profilePicPath }, { new: true })
-                .then((user) => res.status(200).json(user))
-                .catch((error) => res.status(500).send(error.message));
-        } else {
-            // No file uploaded, update only non-file fields
-            Users.findOneAndUpdate({ Username: username }, { Email, Birthday }, { new: true })
-                .then((user) => res.status(200).json(user))
-                .catch((error) => res.status(500).send(error.message));
+app.put('/users/:username', upload.single('profilePic'), passport.authenticate('jwt', { session: false }),
+    async (request, response) => {
+        try {
+            const username = request.params.username;
+            const { Email, Birthday } = request.body;
+
+            // Check if a file was uploaded
+            if (request.file) {
+                const profilePicPath = request.file.path;
+
+                // Save the file path to the user model
+                const updatedUser = await Users.findOneAndUpdate({ Username: username },
+                    { Email, Birthday, profilePic: profilePicPath }, { new: true });
+
+                response.status(200).json(updatedUser);
+            } else {
+                // No file uploaded, update only non-file fields
+                const updatedUser = await Users.findOneAndUpdate({ Username: username },
+                    { Email, Birthday }, { new: true });
+
+                response.status(200).json(updatedUser);
+            }
+
+        } catch (error) {
+            console.error(error);
+            response.status(500).send('Error: ' + error.message);
         }
     });
+
 
 // error logger just in case something wrong happens
 app.use((error, request, response, next) => {
