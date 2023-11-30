@@ -65,12 +65,11 @@ app.use(cors({
 
 // activates the ability to use public folders using express
 app.use(express.static('public'));
-app.use(express.static('uploads'));
 
 // Set up Multer storage
 const storage = multer.diskStorage({
     destination: function (request, file, cb) {
-        cb(null, 'uploads/'); // Specify the directory where uploaded files will be stored
+        cb(null, 'public/uploads/Profile-Pictures'); // Specify the directory where uploaded files will be stored
     },
     filename: function (request, file, cb) {
         cb(null, file.originalname); // Define the filename
