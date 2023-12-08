@@ -162,6 +162,7 @@ app.post('/users',
                 Password: hashedPassword,
                 Email: request.body.Email,
                 Birthday: request.body.Birthday,
+                ProfilePicture: request.body.ProfilePicture
             });
 
             response.status(201).send(request.body.Username + ' has been successfully registered!');
@@ -243,7 +244,8 @@ app.put('/users/:username',
                     $set: {
                         Username: request.body.Username,
                         Email: request.body.Email,
-                        Birthday: request.body.Birthday
+                        Birthday: request.body.Birthday,
+                        ProfilePicture: request.body.ProfilePicture
                     }
                 },
                 { new: true });
