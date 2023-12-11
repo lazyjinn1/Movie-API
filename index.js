@@ -48,7 +48,7 @@ let allowedOrigins = [
     'http://localhost:1234', 
     'http://localhost:8080', 
     'https://jeriflix.netlify.app',
-    'https://jeriflix.netlify.app/login'
+    'http://jeriflix.netlify.app',
 ];
 
 // launches CORS
