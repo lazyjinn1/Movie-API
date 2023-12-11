@@ -27,9 +27,10 @@ const port = 8080;
 // defines a Movies variable that relates to each movie in the Models' Movie Schema.
 const Movies = Models.Movie;
 
-// defines a USers variable that relates to each user in the Models' User Schema.
+// defines a Users variable that relates to each user in the Models' User Schema.
 const Users = Models.User;
-const testPort = 27017;
+
+// const testPort = 27017;
 
 // connects our server to the MongoDB Database LOCALLY
 // var mongodb_conn = mongoose.connect(`mongodb://127.0.0.1:${testPort}/`, {
@@ -44,7 +45,7 @@ mongoose.connect(process.env.CONNECTION_URI, {
 });
 
 // list of origins that are allowed by CORS
-let allowedOrigins = ['http://localhost:1234', 'http://localhost:8080', 'https://jeriflix.netlify.app','https://main--jeriflix.netlify.app'];
+let allowedOrigins = ['http://localhost:1234', 'http://localhost:8080', 'https://jeriflix.netlify.app','https://main--jeriflix.netlify.app', 'https://jeriflix.netlify.com'];
 
 // launches CORS
 app.use(cors({
@@ -70,10 +71,10 @@ app.get('/', (request, response) => {
     response.sendFile('public/documentation.html', { root: __dirname });
 });
 
-app.get('/testApi', (request, response) => {
+// app.get('/testApi', (request, response) => {
 
-    response.status(200).send(mongodb_conn);
-});
+//     response.status(200).send(mongodb_conn);
+// });
 
 // if user loads into /movies, this returns the movies in JSON
 // Request: See all movies
