@@ -252,7 +252,8 @@ app.put('/users/:username',
                         Username: request.body.Username,
                         Email: request.body.Email,
                         Birthday: request.body.Birthday,
-                        ProfilePicture: request.body.ProfilePicture
+                        ProfilePicture: request.body.ProfilePicture,
+                        Bio: request.body.Bio
                     }
                 },
                 { new: true });
