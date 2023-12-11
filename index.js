@@ -44,7 +44,14 @@ mongoose.connect(process.env.CONNECTION_URI, {
 });
 
 // list of origins that are allowed by CORS
-let allowedOrigins = ['http://localhost:1234', 'http://testsite.com', 'http://localhost:8080', 'https://jeriflix.onrender.com', 'mongodb://127.0.0.1:8080'];
+let allowedOrigins = [
+    'http://localhost:1234', 
+    'http://testsite.com', 
+    'http://localhost:8080', 
+    'https://jeriflix.onrender.com', 
+    'mongodb://127.0.0.1:8080',
+    'https://jeriflix.netlify.app'
+];
 
 // launches CORS
 app.use(cors({
