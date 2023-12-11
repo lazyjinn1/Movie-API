@@ -51,7 +51,8 @@ let allowedOrigins = [
     'https://jeriflix.netlify.app',
     'https://main--jeriflix.netlify.app',
     'https://jeriflix.netlify.com',
-    'https://jeriflix.onrender.com/login'
+    'https://jeriflix.onrender.com/login',
+    'https://jeriflix.onrender.com'
 ];
 
 // launches CORS
@@ -62,7 +63,7 @@ app.use(cors({
         if (!origin) return callback(null, true);
         // if the origin exists but does NOT match an origin in the allowedOrigins array, then this error happens
         if (allowedOrigins.indexOf(origin) === -1) {
-            let message = 'The wack CORS policy for this application doesn\'t allow access from origin ' + origin;
+            let message = 'The CORS policy for this application doesn\'t allow access from origin ' + origin;
             return callback(new Error(message), false);
         }
         // if it does match an origin in the allowedOrigins array, then it goes through.
