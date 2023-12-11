@@ -45,7 +45,14 @@ mongoose.connect(process.env.CONNECTION_URI, {
 });
 
 // list of origins that are allowed by CORS
-let allowedOrigins = ['http://localhost:1234', 'http://localhost:8080', 'https://jeriflix.netlify.app','https://main--jeriflix.netlify.app', 'https://jeriflix.netlify.com'];
+let allowedOrigins = [
+    'http://localhost:1234',
+    'http://localhost:8080',
+    'https://jeriflix.netlify.app',
+    'https://main--jeriflix.netlify.app',
+    'https://jeriflix.netlify.com',
+    'https://jeriflix.onrender.com/login'
+];
 
 // launches CORS
 app.use(cors({
@@ -250,7 +257,7 @@ app.put('/users/:username',
                         Bio: request.body.Bio
                     }
                 },
-                { new: true });
+                    { new: true });
                 response.json(updatedUser);
             }
 
