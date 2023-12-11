@@ -214,7 +214,6 @@ app.put('/users/:username',
     passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         try {
-            
             const errors = validationResult(request.body);
             if (!errors.isEmpty()) {
                 return response.status(422).json({ errors: errors.array() });
@@ -227,6 +226,8 @@ app.put('/users/:username',
             // Check if the request body includes a new password.
             if (request.body.Password) {
                 // If a new password is provided, hash it.
+                const hashedPassword = await Users.hashPassword(request.body.Password);
+
                 // Update the user's password with the new hashed password.
                 const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
                     $set: {
