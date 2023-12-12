@@ -79,11 +79,6 @@ app.get('/', (request, response) => {
     response.sendFile('public/documentation.html', { root: __dirname });
 });
 
-// app.get('/testApi', (request, response) => {
-
-//     response.status(200).send(mongodb_conn);
-// });
-
 // if user loads into /movies, this returns the movies in JSON
 // Request: See all movies
 app.get('/movies', passport.authenticate('jwt', { session: false }),
