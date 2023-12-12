@@ -50,8 +50,6 @@ let auth = require('./auth.js')(app);
 const passport = require('passport');
 require('./passport');
 
-
-
 // activates the ability to use public folders using express
 app.use(express.static('public'));
 
