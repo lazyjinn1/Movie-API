@@ -4,45 +4,9 @@ const express = require("express"),
     bodyParser = require("body-parser"),
     path = require("path"),
     cors = require("cors");
+
 // defining a variable app as express's many functions
 const app = express();
-
-// uses body Parser, which allows you to read from the body
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// defines express-validator and what we're using from it.
-const { check, validationResult } = require('express-validator');
-
-// importing the auth.js file.
-let auth = require('./auth.js')(app);
-
-//importing the passport.js file.
-const passport = require('passport');
-require('./passport');
-
-// If you want to connect locally:
-const port = 8080;
-
-// defines a Movies variable that relates to each movie in the Models' Movie Schema.
-const Movies = Models.Movie;
-
-// defines a Users variable that relates to each user in the Models' User Schema.
-const Users = Models.User;
-
-// const testPort = 27017;
-
-// connects our server to the MongoDB Database LOCALLY
-// var mongodb_conn = mongoose.connect(`mongodb://127.0.0.1:${testPort}/`, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// });
-
-//connects our server to the MongoDB Database ON ATLAS
-mongoose.connect(process.env.CONNECTION_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
 
 // list of origins that are allowed by CORS
 let allowedOrigins = [
@@ -59,6 +23,7 @@ let allowedOrigins = [
 app.use(cors({
     // this looks for what the origin is and the appropriate response
     origin: (origin, callback) => {
+        console.log(origin);
         // if there is NO origin, then it goes through
         if (!origin) return callback(null, true);
         // if the origin exists but does NOT match an origin in the allowedOrigins array, then this error happens
@@ -71,8 +36,40 @@ app.use(cors({
     }
 }));
 
+// defines express-validator and what we're using from it.
+const { check, validationResult } = require('express-validator');
+
+// importing the auth.js file.
+let auth = require('./auth.js')(app);
+
+//importing the passport.js file.
+const passport = require('passport');
+require('./passport');
+
+// uses body Parser, which allows you to read from the body
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 // activates the ability to use public folders using express
 app.use(express.static('public'));
+
+const port = 8080;
+
+// defines a Movies and Users variable that relates to each movie in the Models' Movie and User Schema.
+const Movies = Models.Movie;
+const Users = Models.User;
+
+// connects our server to the MongoDB Database LOCALLY
+// var mongodb_conn = mongoose.connect(`mongodb://127.0.0.1:${testPort}/`, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// });
+
+//connects our server to the MongoDB Database ON ATLAS
+mongoose.connect(process.env.CONNECTION_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 
 // default page with no path brings you to documentation
 app.get('/', (request, response) => {
