@@ -8,6 +8,10 @@ const express = require("express"),
 // defining a variable app as express's many functions
 const app = express();
 
+// uses body Parser, which allows you to read from the body
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 // list of origins that are allowed by CORS
 let allowedOrigins = [
     'http://localhost:1234',
@@ -46,9 +50,7 @@ let auth = require('./auth.js')(app);
 const passport = require('passport');
 require('./passport');
 
-// uses body Parser, which allows you to read from the body
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
 
 // activates the ability to use public folders using express
 app.use(express.static('public'));
