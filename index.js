@@ -220,10 +220,6 @@ app.put('/users/:username',
                 return response.status(422).json({ errors: errors.array() });
             }
 
-            if (request.user.Username !== request.params.username) {
-                return response.status(401).send('Permission denied');
-            }
-
             // Check if the request body includes a new password.
             if (request.body.Password) {
                 // If a new password is provided, hash it.
