@@ -60,7 +60,7 @@ const Movies = Models.Movie;
 const Users = Models.User;
 
 // connects our server to the MongoDB Database LOCALLY
-// var mongodb_conn = mongoose.connect(`mongodb://127.0.0.1:${testPort}/`, {
+// mongoose.connect(`mongodb://127.0.0.1:${testPort}/`, {
 //     useNewUrlParser: true,
 //     useUnifiedTopology: true
 // });
