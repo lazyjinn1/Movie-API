@@ -148,10 +148,10 @@ app.post('/users',
         check('Email', 'Email is invalid').isEmail()
     ], async (request, response) => {
         try {
-            // const errors = validationResult(request);
-            // if (!errors.isEmpty()) {
-            //     return response.status(422).json({ errors: errors.array() });
-            // }
+            const errors = validationResult(request);
+            if (!errors.isEmpty()) {
+                return response.status(422).json({ errors: errors.array() });
+            }
 
             const existingUser = await Users.findOne({ Username: request.body.Username });
             if (existingUser) {
