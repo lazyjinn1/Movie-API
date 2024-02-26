@@ -163,7 +163,7 @@ app.post('/users',
                     Password: hashedPassword,
                     Email: request.body.Email,
                     Birthday: request.body.Birthday,
-                    // ProfilePicture: request.body.ProfilePicture
+                    ProfilePicture: request.body.ProfilePicture
                 });
                 response.status(201).send(request.body.Username + ' has been successfully registered!');
             }
