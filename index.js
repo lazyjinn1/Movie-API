@@ -149,25 +149,24 @@ app.post('/users',
     ], async (request, response) => {
         try {
             const errors = validationResult(request);
+            const existingUser = await Users.findOne({ Username: request.body.Username });
+            const hashedPassword = await Users.hashPassword(request.body.Password);
             if (!errors.isEmpty()) {
                 return response.status(422).json({ errors: errors.array() });
             }
 
-            const existingUser = await Users.findOne({ Username: request.body.Username });
             if (existingUser) {
                 return response.status(400).send(request.body.Username + ' already exists');
+            } else {
+                await Users.create({
+                    Username: request.body.Username,
+                    Password: hashedPassword,
+                    Email: request.body.Email,
+                    Birthday: request.body.Birthday,
+                    // ProfilePicture: request.body.ProfilePicture
+                });
+                response.status(201).send(request.body.Username + ' has been successfully registered!');
             }
-
-            const hashedPassword = await Users.hashPassword(request.body.Password);
-            await Users.create({
-                Username: request.body.Username,
-                Password: hashedPassword,
-                Email: request.body.Email,
-                Birthday: request.body.Birthday,
-                ProfilePicture: request.body.ProfilePicture
-            });
-
-            response.status(201).send(request.body.Username + ' has been successfully registered!');
         } catch (error) {
             console.error(error);
             response.status(500).send('Error: ' + error.message);
