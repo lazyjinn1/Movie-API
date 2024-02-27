@@ -22,16 +22,15 @@ let allowedOrigins = [
     'https://jeriflix.netlify.com',
     'https://jeriflix.onrender.com/login',
     'https://jeriflix.onrender.com',
-    'https://lazyjinn1.github.io/Jeriflix-Angular-client/welcome',
-    'https://lazyjinn1.github.io/Jeriflix-Angular-client',
-    'https://lazyjinn1.github.io/'
+    'http://lazyjinn1.github.io/Jeriflix-Angular-client/welcome',
+    'http://lazyjinn1.github.io/Jeriflix-Angular-client',
+    'http://lazyjinn1.github.io/'
 ];
 
 // launches CORS
 app.use(cors({
     // this looks for what the origin is and the appropriate response
     origin: (origin, callback) => {
-        console.log(origin);
         // if there is NO origin, then it goes through
         if (!origin) return callback(null, true);
         // if the origin exists but does NOT match an origin in the allowedOrigins array, then this error happens
