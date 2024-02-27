@@ -40,7 +40,8 @@ app.use(cors({
         }
         // if it does match an origin in the allowedOrigins array, then it goes through.
         return callback(null, true);
-    }
+    },
+    credentials: true
 }));
 
 // defines express-validator and what we're using from it.
