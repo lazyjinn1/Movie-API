@@ -21,7 +21,9 @@ let allowedOrigins = [
     'https://main--jeriflix.netlify.app',
     'https://jeriflix.netlify.com',
     'https://jeriflix.onrender.com/login',
-    'https://jeriflix.onrender.com'
+    'https://jeriflix.onrender.com',
+    'https://lazyjinn1.github.io/Jeriflix-Angular-client/welcome',
+    'https://lazyjinn1.github.io/Jeriflix-Angular-client',
 ];
 
 // launches CORS
