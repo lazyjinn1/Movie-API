@@ -22,9 +22,6 @@ let allowedOrigins = [
     'https://jeriflix.netlify.com',
     'https://jeriflix.onrender.com/login',
     'https://jeriflix.onrender.com',
-    'http://lazyjinn1.github.io/Jeriflix-Angular-client/welcome',
-    'http://lazyjinn1.github.io/Jeriflix-Angular-client',
-    'http://lazyjinn1.github.io/',
     'https://lazyjinn1.github.io/Jeriflix-Angular-client/welcome',
     'https://lazyjinn1.github.io/Jeriflix-Angular-client',
     'https://lazyjinn1.github.io/'
