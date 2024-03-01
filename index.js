@@ -23,6 +23,7 @@ let allowedOrigins = [
     'https://jeriflix.onrender.com/login',
     'https://jeriflix.onrender.com',
     'https://lazyjinn1.github.io/Jeriflix-Angular-client/welcome',
+    'https://lazyjinn1.github.io/Jeriflix-Angular-client/movies',
     'https://lazyjinn1.github.io/Jeriflix-Angular-client',
     'https://lazyjinn1.github.io'
 ];
