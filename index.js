@@ -17,6 +17,7 @@ let allowedOrigins = [
     'http://localhost:1234',
     'http://localhost:8080',
     'http://localhost:4200',
+    'http://localhost:4200/',
     'https://jeriflix.netlify.app',
     'https://main--jeriflix.netlify.app',
     'https://jeriflix.netlify.com',
