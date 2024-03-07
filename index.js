@@ -212,10 +212,11 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }),
 
 // Request: Change Account Information
 app.put('/users/:username',
-    [check('Username', 'Username is too short').isLength({ min: 5 }).optional({ checkFalsy: true }),
-    check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric().optional({ checkFalsy: true }),
-    check('Email', 'Email is invalid').isEmail().optional({ checkFalsy: true }),
-    check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
+    [
+        check('Username', 'Username is too short').isLength({ min: 5 }).optional({ checkFalsy: true }),
+        check('Username', 'Non-alphanumeric Usernames are not allowed').isAlphanumeric().optional({ checkFalsy: true }),
+        check('Email', 'Email is invalid').isEmail().optional({ checkFalsy: true }),
+        check('Birthday', 'Birthday is invalid').isDate().optional({ checkFalsy: true }),
     ],
     passport.authenticate('jwt', { session: false }),
     async (request, response) => {
@@ -227,6 +228,17 @@ app.put('/users/:username',
 
             if (request.user.Username !== request.params.username) {
                 return response.status(401).send('Permission denied');
+            }
+
+            if (
+                !request.body.Username &&
+                !request.body.Email &&
+                !request.body.Birthday &&
+                !request.body.ProfilePicture &&
+                !request.body.Bio &&
+                !request.body.Password
+            ) {
+                return response.status(400).json({ message: 'No updates provided' });
             }
 
             // Check if the request body includes a new password.
@@ -241,24 +253,23 @@ app.put('/users/:username',
                     }
                 },
                     { new: true });
-                response.json(updatedUser);
+                return response.json(updatedUser);
             }
 
-            else {
-                // Check if the request body has something else.
-                const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
-                    $set: {
-                        Username: request.body.Username,
-                        Email: request.body.Email,
-                        Birthday: request.body.Birthday,
-                        ProfilePicture: request.body.ProfilePicture,
-                        Bio: request.body.Bio
-                    }
-                },
-                    { new: true });
-                response.json(updatedUser);
-            }
+            // Update other user information
+            const updateFields = {};
+            if (request.body.Username) updateFields.Username = request.body.Username;
+            if (request.body.Email) updateFields.Email = request.body.Email;
+            if (request.body.Birthday) updateFields.Birthday = request.body.Birthday;
+            if (request.body.ProfilePicture) updateFields.ProfilePicture = request.body.ProfilePicture;
+            if (request.body.Bio) updateFields.Bio = request.body.Bio;
 
+            const updatedUser = await Users.findOneAndUpdate({ Username: request.params.username }, {
+                $set: updateFields
+            },
+                { new: true });
+
+            response.json(updatedUser);
 
         } catch (error) {
             console.error(error);
