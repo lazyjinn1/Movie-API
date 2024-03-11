@@ -5,24 +5,27 @@ const passport = require('passport'),
     Models = require('./models.js'),
     passportJWT = require('passport-jwt');
 
-// bringing User from Models.js and giving different middleware functions for JWTStrategy and ExtractJWT
+// Importing User model from Models.js and middleware functions for JWTStrategy and ExtractJWT
 let Users = Models.User;
-    JWTStrategy = passportJWT.Strategy,
-    ExtractJWT = passportJWT.ExtractJwt;
+let JWTStrategy = passportJWT.Strategy;
+let ExtractJWT = passportJWT.ExtractJwt;
 
+/**
+ * Passport middleware for local authentication strategy.
+ */
 passport.use(
     // LocalStrategy looks for just Username and Password
     new LocalStrategy(
-        {   
+        {
             usernameField: 'Username',
             passwordField: 'Password',
         },
-        // this looks to see if said username is found in the database
+        // this looks to see if said username is found in the database and validates the password
         async (username, password, callback) => {
             console.log(`${username} ${password}`);
-            await Users.findOne({Username: username})
-                .then((user)=> {
-                    if(!user){
+            await Users.findOne({ Username: username })
+                .then((user) => {
+                    if (!user) {
                         console.log('Username not found');
                         return callback(null, false, {
                             message: 'Incorrect username or password.',
@@ -30,7 +33,7 @@ passport.use(
                     }
 
                     // validates if hashed password matches hashed password in database
-                    if(!user.validatePassword(password)) {
+                    if (!user.validatePassword(password)) {
                         console.log('Incorrect Password');
                         return callback(null, false, {
                             message: 'Incorrect username or password.'
@@ -39,20 +42,22 @@ passport.use(
                     console.log('finished');
                     return callback(null, user);
                 })
-            .catch((error) => {
-                if(error){
-                    console.log(error);
-                    return callback(error);
-                }
-            })
+                .catch((error) => {
+                    if (error) {
+                        console.log(error);
+                        return callback(error);
+                    }
+                })
         }
     )
 );
 
-// this is the key that is extracted in order to access restricted endpoints.
+/**
+ * Passport middleware for JWT authentication strategy.
+ */
 passport.use(new JWTStrategy({
     jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-    secretOrKey: 'your_jwt_secret' 
+    secretOrKey: 'your_jwt_secret'
 }, async (jwtPayload, callback) => {
     try {
         const user = await Users.findById(jwtPayload._id);

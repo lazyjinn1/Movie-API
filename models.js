@@ -1,10 +1,9 @@
-// allows us to use the different Schemas used for our movies and users.
 const mongoose = require('mongoose');
-//allows us to use hashPassword so we can hash out private information such as passwords
 const bcrypt = require('bcrypt');
 
-
-// this is the schema (schematics) for our movies
+/**
+ * Movie schema for storing movie information.
+ */
 let movieSchema = mongoose.Schema({
     Title: {type: String, required: true},
     Description: {type: String, required: true},
@@ -20,7 +19,9 @@ let movieSchema = mongoose.Schema({
     Featured: Boolean,
 });
 
-// this is the schema (schematics) for our users
+/**
+ * User schema for storing user information.
+ */
 let userSchema = mongoose.Schema({
     Username: {type: String, required: true},
     Password: {type: String, required: true},
@@ -28,25 +29,38 @@ let userSchema = mongoose.Schema({
     Birthday: {type: Date},
     FavoriteMovies: [{type: mongoose.Schema.Types.ObjectId, ref: 'Movie'}],
     ProfilePicture: {type: String},
-    Bio: {type:String}
-})
+    Bio: {type: String}
+});
 
-// this hashes the password that is inputted for the userSchema. Hashing means that it gets 
-// essentially codified and impossible to revert back to normal
+/**
+ * Hashes the provided password.
+ * @param {string} Password - The password to be hashed.
+ * @returns {string} - The hashed password.
+ */
 userSchema.statics.hashPassword = (Password) => {
     return bcrypt.hashSync(Password,10);
 };
 
-// However, the hashed password can be compared to the hashed password that is in the database to allow login.
+/**
+ * Validates the provided password against the stored hashed password.
+ * @param {string} Password - The password to validate.
+ * @returns {boolean} - True if the provided password matches the stored hashed password, false otherwise.
+ */
 userSchema.methods.validatePassword = function(Password) {
     return bcrypt.compareSync(Password, this.Password);
 };
 
-// gives variables for the finalized model (movie and user)
-let Movie = mongoose.model('Movie',movieSchema);
+// Model definitions
+/**
+ * Movie model for interacting with the movies collection.
+ */
+let Movie = mongoose.model('Movie', movieSchema);
+
+/**
+ * User model for interacting with the users collection.
+ */
 let User = mongoose.model('User', userSchema);
 
-// exports said variables for usage in other files.
+// Export models for usage in other files
 module.exports.Movie = Movie;
 module.exports.User = User;
-

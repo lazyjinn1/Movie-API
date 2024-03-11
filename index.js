@@ -1,14 +1,14 @@
-const express = require("express"),
-    mongoose = require("mongoose"),
-    Models = require("./models.js"),
-    bodyParser = require("body-parser"),
-    path = require("path"),
-    cors = require("cors");
+const express = require("express");
+const mongoose = require("mongoose");
+const Models = require("./models.js");
+const bodyParser = require("body-parser");
+const path = require("path");
+const cors = require("cors");
 
-// defining a variable app as express's many functions
+// Defining an instance of express application
 const app = express();
 
-// uses body Parser, which allows you to read from the body
+// Middleware for parsing request bodies as JSON
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -29,122 +29,138 @@ let allowedOrigins = [
     'https://lazyjinn1.github.io'
 ];
 
-// launches CORS
+// Middleware for CORS configuration
 app.use(cors({
-    // this looks for what the origin is and the appropriate response
+    // Checks if the origin is allowed and responds accordingly
     origin: (origin, callback) => {
-        // if there is NO origin, then it goes through
+        // If no origin is provided, proceed
         if (!origin) return callback(null, true);
-        // if the origin exists but does NOT match an origin in the allowedOrigins array, then this error happens
+        // If the origin is not found in the allowedOrigins array, return an error
         if (allowedOrigins.indexOf(origin) === -1) {
             let message = 'The CORS policy for this application doesn\'t allow access from origin ' + origin;
             return callback(new Error(message), false);
         }
-        // if it does match an origin in the allowedOrigins array, then it goes through.
+        // If the origin is found in the allowedOrigins array, proceed
         return callback(null, true);
     },
     credentials: true
 }));
 
-// defines express-validator and what we're using from it.
+// Express-validator
 const { check, validationResult } = require('express-validator');
 
-// importing the auth.js file.
+// Importing authentication middleware
 let auth = require('./auth.js')(app);
 
-//importing the passport.js file.
+// Importing passport authentication middleware
 const passport = require('passport');
 require('./passport');
 
-// activates the ability to use public folders using express
+// Middleware to serve static files from the 'public' folder
 app.use(express.static('public'));
 
 const port = 8080;
 
-// defines a Movies and Users variable that relates to each movie in the Models' Movie and User Schema.
+// Define Movies and Users variables based on models from models.js
 const Movies = Models.Movie;
 const Users = Models.User;
 
-// connects our server to the MongoDB Database LOCALLY
-// mongoose.connect(`mongodb://127.0.0.1:${testPort}/`, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// });
-
-//connects our server to the MongoDB Database ON ATLAS
+// Connect to MongoDB Atlas
 mongoose.connect(process.env.CONNECTION_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
 
-// default page with no path brings you to documentation
+// Default page with no path redirects to documentation
 app.get('/', (request, response) => {
     response.sendFile('public/documentation.html', { root: __dirname });
 });
 
-// if user loads into /movies, this returns the movies in JSON
-// Request: See all movies
+// Endpoint to get all movies
+/**
+ * Request: See all movies
+ * Authorization: JWT token required
+ */
 app.get('/movies', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find()
-            // if movies are found, it responds with a positive status code and a list of the 
-            // movies written in Json
+            // Respond with list of movies in JSON format
             .then((movies) => {
                 response.status(200).json(movies);
             })
-            // if movies are not found, sends back an error.
+            // Respond with error if movies are not found
             .catch((error) => {
                 console.error(error);
                 response.status(404).send('Error: ' + error.message);
             });
     });
 
-// Request: See specific movie details
+// Endpoint to get specific movie details by title
+/**
+ * Request: See specific movie details
+ * Authorization: JWT token required
+ * @param {string} title - Title of the movie
+ */
 app.get('/movies/:title', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.findOne({ Title: request.params.title })
-            // if a movie is found with the given title, said movie is returned.
+            // Respond with the movie details if found
             .then((movies) => {
                 response.status(200).json(movies);
             })
-            // if no movies are found, sends back an error.
+            // Respond with error if movie is not found
             .catch((error) => {
                 console.error(error);
                 response.status(404).send('Error: ' + error.message);
             });
     })
 
-// Request: See movies by genre
+// Endpoint to get movies by genre
+/**
+ * Request: See movies by genre
+ * Authorization: JWT token required
+ * @param {string} genre - Genre of the movies
+ */
 app.get('/movies/genres/:genre', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find({ 'Genre.Name': request.params.genre })
-            // if movies are found with the given genre, said movies is returned.
+            // Respond with movies filtered by genre
             .then((movie) => {
                 response.json(movie);
             })
-            // if no movies are found, sends back an error.
+            // Respond with error if movies are not found
             .catch((error) => {
                 console.error(error);
                 response.status(404).send('Error: ' + error.message);
             })
     })
 
-// Request: See movies by director
+// Endpoint to get movies by director
+/**
+ * Request: See movies by director
+ * Authorization: JWT token required
+ * @param {string} director - Name of the director
+ */
 app.get('/movies/directors/:director', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Movies.find({ 'Director.Name': request.params.director })
-            // if movies are found with the given director, said movies is returned.
+            // Respond with movies filtered by director
             .then((movie) => {
                 response.json(movie);
             })
-            // if no movies are found, sends back an error.
+            // Respond with error if movies are not found
             .catch((error) => {
                 console.error(error);
                 response.status(404).send('Error: ' + error.message);
             })
     })
 
-// Request: Registration
+/**
+ * Handles user registration.
+ * @param {Object} request - The HTTP request object.
+ * @param {Object} response - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when registration is complete.
+ */
 app.post('/users',
     [
         check('Username', 'Username is too short').isLength({ min: 5 }),
@@ -180,7 +196,12 @@ app.post('/users',
 );
 
 
-//Request: See all users
+/**
+ * Retrieves all users.
+ * @param {Object} request - The HTTP request object.
+ * @param {Object} response - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when user retrieval is complete.
+ */
 app.get('/users', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Users.find()
@@ -195,7 +216,12 @@ app.get('/users', passport.authenticate('jwt', { session: false }),
             });
     });
 
-// Request: See specific users
+/**
+ * Retrieves a specific user by username.
+ * @param {Object} request - The HTTP request object.
+ * @param {Object} response - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when user retrieval is complete.
+ */
 app.get('/users/:username', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         await Users.findOne({ Username: request.params.username })
@@ -210,7 +236,12 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }),
             });
     });
 
-// Request: Change Account Information
+/**
+ * Updates account information for a user.
+ * @param {Object} request - The HTTP request object.
+ * @param {Object} response - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when the account information is updated.
+ */
 app.put('/users/:username',
     [
         check('Username', 'Username is too short').isLength({ min: 5 }).optional({ checkFalsy: true }),
@@ -278,7 +309,12 @@ app.put('/users/:username',
     });
 
 
-// Request: Delete specific users
+/**
+ * Deletes a specific user.
+ * @param {Object} request - The HTTP request object.
+ * @param {Object} response - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when the user is deleted.
+ */
 app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         // this looks to see if there are any people with this username AND deletes it.
@@ -298,7 +334,12 @@ app.delete('/users/:username', passport.authenticate('jwt', { session: false }),
             });
     });
 
-// Request: Add movie to favorites
+/**
+ * Adds a movie to the user's favorites list.
+ * @param {Object} request - The HTTP request object.
+ * @param {Object} response - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when the movie is added to favorites.
+ */
 app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         try {
@@ -336,7 +377,12 @@ app.put('/users/:username/favorites/:movieID', passport.authenticate('jwt', { se
 
     });
 
-// Request: Remove movie from favorites
+/**
+ * Removes a movie from the user's favorites list.
+ * @param {Object} request - The HTTP request object.
+ * @param {Object} response - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when the movie is removed from favorites.
+ */
 app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', { session: false }),
     async (request, response) => {
         try {
@@ -374,14 +420,14 @@ app.delete('/users/:username/favorites/:movieID', passport.authenticate('jwt', {
 
     });
 
-// error logger just in case something wrong happens
+// Error logger middleware
 app.use((error, request, response, next) => {
     console.error(error.stack);
     console.log('Whoops, something broke');
     response.status(500).json({ error: 'Something Broke Oh no!', message: error.message });
 });
 
-//default port
+// Default port
 app.listen(port, '0.0.0.0', () => {
     console.log(`You are listening on port ` + `${port}`)
 });
