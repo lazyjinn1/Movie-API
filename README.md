@@ -44,7 +44,7 @@ Alternatively:
 
 ## Contributing
 
-Contributions to this app is welcome! If you have any suggestions, bug fixes, or feature enhancements, feel free to open an issue or submit a pull request.
+Contributions to this app are welcome! If you have any suggestions, bug fixes, or feature enhancements, feel free to open an issue or submit a pull request.
 
 Before contributing, please review the [Code of Conduct](CODE_OF_CONDUCT.md).
 
