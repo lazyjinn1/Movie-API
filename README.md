@@ -3,20 +3,10 @@
 This is the API for my Jeriflix Client. It uses MongoDB in combination with Node and Express in order to create different endpoints to deliver the user to their desired outcomes.
 
 ## Table of Contents
-
-- [Screenshots](#screenshots)
 - [Features](#features)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
-
-## Screenshots
-![plot](./assets/screenshots/screenshot1.png)
-![plot](./assets/screenshots/screenshot2.png)
-![plot](./assets/screenshots/screenshot3.png)
-![plot](./assets/screenshots/screenshot4.png)
-![plot](./assets/screenshots/screenshot5.png)
-
 
 ## Features
 
