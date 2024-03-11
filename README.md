@@ -35,9 +35,12 @@ Alternatively:
 
 ## Usage
 
-1. First direct yourself towards the Registration endpoint.
-2. Log-in using your new information
-3. Browse the different movie titles, and add them to your favorites list!
+1. Connect this backend API to your front-end client to utilize its features such as:
+    - Registering and Logging in
+    - Viewing movies and their information (Descriptions, Directors, Genres etc.,)
+    - Add or delete movies from your favorites list
+    - View and edit your profile
+    - Delete your account
 
 ## Contributing
 
