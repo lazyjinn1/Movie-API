@@ -23,18 +23,6 @@ This is the API for my Jeriflix Client. It uses MongoDB in combination with Node
 
 To run this App, you need a web browser with JavaScript enabled, along with the dependencies listed under package.json: 
 
-"bcrypt": "^5.1.1",
-"body-parser": "^1.20.2",
-"cors": "^2.8.5",
-"express": "^4.18.2",
-"express-validator": "^7.0.1",
-"jsonwebtoken": "^9.0.2",
-"mongoose": "^7.6.2",
-"morgan": "^1.10.0",
-"passport": "^0.6.0",
-"passport-jwt": "^4.0.1",
-"passport-local":"^1.0.0"
-
 ### Installation
 
 1. Clone or download the repository to your local machine.
